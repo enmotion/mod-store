@@ -1,10 +1,18 @@
 import EBS from "../lib/index.js";//引入文件
 const db1 = new EBS('morez1')
 const db2 = new EBS('morez2')
+// var aes = require("crypto-js/aes");
+// var utf8 = require('crypto-js/enc-Utf8')
+// var ciphertext = aes.encrypt('my message2', 'SDER').toString();
+// console.log(ciphertext)
+// var bytes  = aes.decrypt(ciphertext, 'SDER');
+// console.log(utf8,bytes)
+// var originalText = bytes.toString(utf8);
+// console.log(originalText)
 db1.addProps({
     name:{
         type:[String,Object],
-        method:"S",
+        method:"C",
         default:'mod1',
         expireTime:1000
     },
@@ -60,6 +68,6 @@ db2.addProps({
 console.log(db1.$data.name,1)
 console.log(db2.$data.name,2)
 // console.log(db2)
-// db1.clear("ALL")
+// db1.clear("EBS")
 console.log(localStorage);
 console.log(sessionStorage)

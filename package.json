@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/enmotion/BrowserStorage#readme",
   "dependencies": {
+    "aes": "^0.1.0",
     "ramda": "^0.27.1"
   },
   "devDependencies": {

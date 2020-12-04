@@ -1,6 +1,6 @@
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-// const TerserPlugin = require('terser-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
     entry: {
@@ -18,16 +18,16 @@ module.exports = {
         }),  
     ],
     optimization: {
-        // minimize: true,
-        // minimizer: [ new TerserPlugin({
-        //     test: /\.js(\?.*)?$/i,
-        //     terserOptions: {
-        //         output: {
-        //             comments: false,
-        //         },
-        //     },
-        //     extractComments: true,
-        // })],
+        minimize: true,
+        minimizer: [ new TerserPlugin({
+            test: /\.js(\?.*)?$/i,
+            terserOptions: {
+                output: {
+                    comments: false,
+                },
+            },
+            extractComments: true,
+        })],
     },
     devtool: "source-map",
     devServer: {        

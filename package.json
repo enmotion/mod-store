@@ -1,5 +1,5 @@
 {
-  "name": "mod-browser-storage",
+  "name": "easy-browser-store",
   "version": "1.2.0",
   "description": "Web browser localstorage & sessionstorage until",
   "main": "./lib/index.js",

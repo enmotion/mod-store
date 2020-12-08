@@ -5,7 +5,7 @@ db1.addProps({
     name:{
         type:[String,Object],
         method:"L",
-        default:'mod1',
+        default:{},
         expireTime:1000
     },
     age:{
@@ -43,7 +43,7 @@ db2.addProps({
         // expireTime:1
     },   
 })
-db1.$data.name='enmoton'
+// db1.$data.name='enmoton'
 // db2.$data.name="enmotion2"
 // console.log(db1.$data.name,1)
 // console.log(db2.$data.name,2)

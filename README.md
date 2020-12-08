@@ -1,33 +1,33 @@
-# mod-browser-storage #
+# easy-browser-store #
 
 为在浏览器环境下，为操作持久化的缓存数据提供便捷。<br>
 
-#### 设计思路：####
-1.避免数据数据污染，同域下访问不同应用之间对缓存数据的隔离方案不全，导致容易出现数据污染的情况;<br>
-2.数据读写时，繁琐的 JSON.stringify(),JSON.parse()转换，导致易错且操作麻烦;<br>
-3.数据时效性，如登录等敏感场景，数据处理需要一些辅助的解决方式;本模块提供写入时设置过期时间，与读取时判断新鲜度时间，双重有效性管理手段l;<br>
-4.数据类型，在多人开发的场景中，出现垮场景调度时，缺乏同一的数据类型规范约束;<br>
-5.缓存空间管理，如何对历史遗留的死数据，进行安全的清理。<br>
-
+#### 功能概述：####
+1.支持命名空间：避免数据数据污染，同域下访问不同应用之间对缓存数据的隔离方案不全，导致容易出现数据污染的情况;<br>
+2.简便化操作：数据读写时，繁琐的 JSON.stringify(),JSON.parse()转换，导致易错且操作麻烦;通过Object.defineProperty,实现数据的快捷读写<br>
+3.数据时效性：写入数据时更新数据写入时间，读出时比对数据props中的过期设置，可针对性解决数据时效问题，同时提供只读一次数据写入属性，读后即焚<br>
+4.数据类型校验：为避免在实际操作时，数据类型的不准确性，导致应用崩溃，因此支持了数据的类型校验，发现数据类型错误时，则会报异常并终止读写操作<br>
+5.缓存空间管理：可清除本地缓存数据，应用模式，EBS模式，全局模式三种模式可分别情理不同的缓存数据情况。<br>
+6.数据加密：支持自定义16字符长度的字符串为密钥，对存入的数据进行加解密处理，避免敏感数据明文暴露。<br>
 #### install ####
 npm安装命令
 ```
-npm install --save mod-browser-storage
+npm install --save easy-browser-store
 ```
 
 #### Usage ####
 
 引入包
 ```
-import MBS from "mod-browser-storage"
+import EBS from "easy-browser-store"
 ```
 
 范例
 
 ```
-import MBS from "mod-browser-storage"
+import EBS from "easy-browser-store"
 
-let BS=new MBS.createStorage("appName","version");
+let BS=new EBS("appName",key);//如果创建实例时，有KEY值，则会采用加密模式,
 
 BS.addItems({
     name:{

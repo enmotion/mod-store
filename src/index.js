@@ -1,24 +1,19 @@
 "use strict";
 const R = require('ramda');
-const aes = require('aes-js');
-import {setCookie,getCookie,clearCookie} from "./cookieStorage";
+import {setCookie,getCookie,clearCookie} from "./libs/cookie";
+import Crypto from "./libs/crypto"
 
+let nameSpacePool={};
 function EBS(namespace,key){
+    //判断命名空间实例是否已经存在，如果存在则返回true  
+    if(R.keys(nameSpacePool).indexOf("EBS:"+namespace.toUpperCase()+"#")>-1){
+        console.error("ERROR:STORAGE ["+namespace+"] is already exsit, cannot be init again！")
+        return {};
+    }
     const storeTypes = {'L':'localStorage','S':'sessionStorage'};
     const dataBase = {};
     const cache = {localStorage:{},sessionStorage:{},cookieStorage:{}};
-    var aesKey = [];
-    function verifyKey(key){
-        //如果没有设置key，则存储为明文模式
-        if(R.isNil(key)){
-            return true;
-        }else if( key.constructor == String && key.length == 16){
-            for(var i in key){aesKey.push(key[i].charCodeAt())}
-            return true
-        }
-        console.error("ERROR: STORAGE [" + namespace + "] crypto Key type check failed,Expected String 16 length,got "+key.constructor.name +' '+ key.length+" length")
-        return false;        
-    }
+    let aesCrypto = new Crypto(key);
     //检测环境是否携带locaoStorage方法，防止浏览器开启了无痕模式导致localStorage/sessionStorage不兼容的情况
     const storeMethods = {
         localStorage:window.localStorage,
@@ -30,8 +25,8 @@ function EBS(namespace,key){
         }
     }
     // window.cookieStroage={setItem:setCookie,getItem:getCookie};
-    const hasLocalStorage = withLocalApis(window.localStorage);
-    const hasSessionStorage = withLocalApis(window.sessionStorage);
+    const hasLocalStorage = withLocalApis(storeMethods.localStorage);
+    const hasSessionStorage = withLocalApis(storeMethods.sessionStorage);
     // 检测本地存储方法是否可行,如果存在不能使用的方法，则会启用cookie存储模式替代
     function withLocalApis(storage){
         try {
@@ -86,19 +81,19 @@ function EBS(namespace,key){
                         if(types.indexOf(value.constructor)<0){
                             console.error("ERROR:STORAGE [" + dataBase.$namespace + "] $data."+i+" invalid value,type check failed,Expected [" +R.pluck("name")(types)+"], got "+value.constructor.name)
                         }else{
-                            cache[schemes[i].method][i] = {
+                            let cacheData = deCryptoData(storeMethods[schemes[i].method].getItem(dataBase.$namespace))||{};
+                            cacheData[i] = {
                                 value: value,
                                 type: value.constructor.name,
                                 ut: Math.round(Date.now() / 1000) //刷新更新时间
                             }
-                            var dataStr = enCryptoData(JSON.stringify(cache[schemes[i].method]))
+                            var dataStr = enCryptoData(cacheData[i])
                             // storeMethods[schemes[i].method].setItem(dataBase.$namespace,JSON.stringify(cache[schemes[i].method]))
                             storeMethods[schemes[i].method].setItem(dataBase.$namespace,dataStr)
                         }
                     },
                     get:function(){
                         let now = Math.round(Date.now() / 1000);
-                        // let cacheData =JSON.parse(storeMethods[schemes[i].method].getItem(dataBase.$namespace))||{};
                         let cacheData = deCryptoData(storeMethods[schemes[i].method].getItem(dataBase.$namespace))||{};
                         if(cacheData.constructor == Object && cacheData[i] && (schemes[i].expireTime == null || now < schemes[i].expireTime + cacheData[i].ut)){
                             var data = cacheData[i];
@@ -107,6 +102,7 @@ function EBS(namespace,key){
                                storeMethods[schemes[i].method].setItem(dataBase.$namespace,JSON.stringify(cache[schemes[i].method]));
                             }
                             let types = schemes[i].type.constructor == Function ? [schemes[i].type] : schemes[i].type;
+                            //如果值类型不对，则返回默认值，否则返回正确值
                             if(types.indexOf(data.value.constructor)>-1){
                                 return data.value
                             }else{
@@ -121,8 +117,9 @@ function EBS(namespace,key){
         }
     }
     function enCryptoData(data){
-        var str = JSON.stringify(data)
-        if(!R.isEmpty(aesKey)){
+        var str = aesCrypto.enCryptoData(JSON.stringify(data))
+        //包含加密的key 则需加密才可存入数据
+        if(!R.isEmpty(aesKey)){         
             var textBytes = aes.utils.utf8.toBytes(str);
             var aesCtr = new aes.ModeOfOperation.ctr(aesKey, new aes.Counter(5));
             var encryptedBytes = aesCtr.encrypt(textBytes);
@@ -133,13 +130,18 @@ function EBS(namespace,key){
         }
     }
     function deCryptoData(str){
-        //包含加密的key
+        //包含加密的key 则需解密才可取出数据
         if(!R.isEmpty(aesKey) && str){
-            var encryptedBytes = aes.utils.hex.toBytes(str);
-            var aesCtr = new aes.ModeOfOperation.ctr(aesKey, new aes.Counter(5));
-            var decryptedBytes = aesCtr.decrypt(encryptedBytes);
-            var decryptedText = aes.utils.utf8.fromBytes(decryptedBytes);
-            return JSON.parse(JSON.parse(decryptedText));
+            try{
+                var encryptedBytes = aes.utils.hex.toBytes(str);
+                var aesCtr = new aes.ModeOfOperation.ctr(aesKey, new aes.Counter(5));
+                var decryptedBytes = aesCtr.decrypt(encryptedBytes);
+                var decryptedText = aes.utils.utf8.fromBytes(decryptedBytes);
+                return JSON.parse(decryptedText);
+            }catch(err){
+                console.error("ERROR:[" + dataBase.$namespace + "] try to get data with wrong key!")
+                return {}
+            }            
         }else{
             return JSON.parse(str);
         }
@@ -193,10 +195,12 @@ function EBS(namespace,key){
             case 'ALL':
                 storeMethods.localStorage.clear();
                 storeMethods.sessionStorage.clear();
+                for(var i in storeMethods.cookieStorage.getItem()){
+                    storeMethods.cookieStorage.removeItem(i)
+                }
             break;
         }
-    }
-    if(!verifyKey(key)){return {}}    
+    }  
     //校验namespace参数不能为空或者非字符类型
     if(R.isNil(namespace) || R.isEmpty(namespace) || namespace.constructor != String){
         console.error("ERROR: EasyBrowserStrore Constructor parameter [namespace] cannot be empty and must be a String");
@@ -220,6 +224,7 @@ function EBS(namespace,key){
             beforeSet:{writable:true,configurable:false,enumerable:false,value:function(str){return str}},
             beforeGet:{writable:true,configurable:false,enumerable:false,value:function(str){return str}}
         })
+        nameSpacePool[dataBase.$namespace] = dataBase;
         return dataBase
     }   
 }

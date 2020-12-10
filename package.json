@@ -2,7 +2,7 @@
   "name": "easy-browser-store",
   "version": "1.2.0",
   "description": "Web browser localstorage & sessionstorage until",
-  "main": "./lib/index.js",
+  "main": "./src/index.js",
   "scripts": {
     "build": "npx webpack",
     "build-watch": "npx webpack --watch",

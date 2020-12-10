@@ -1,6 +1,6 @@
-import EBS from "../lib/index.js";//引入文件
+import EBS from "../src/index.js";//引入文件
 const db1 = new EBS('morez1',"1BcDe%HUTTyhjoLp")
-const db2 = new EBS('morez2',"YUHJ&*()1234erty")
+const db2 = new EBS('morez2')
 db1.addProps({
     name:{
         type:[String,Object],
@@ -32,7 +32,7 @@ db2.addProps({
     age:{
         type:Number,
         default:22,
-        method:'S'
+        method:'L'
     }
 })
 db2.addProps({
@@ -43,20 +43,21 @@ db2.addProps({
         // expireTime:1
     },   
 })
-// db1.$data.name='enmoton'
-// db2.$data.name="enmotion2"
 // console.log(db1.$data.name,1)
 // console.log(db2.$data.name,2)
 // db1.$data.age=40
 // db2.removeProp('name')
-db2.addProps({
-    name:{
-        type:[String,Object],
-        method:"L",
-        default:'mod23',
-        expireTime:1000
-    },
-})
+// db2.addProps({
+//     name:{
+//         type:[String,Object],
+//         method:"S",
+//         default:'mod23',
+//         expireTime:1000
+//     },
+// })
+db1.$data.name='enmotion'
+db2.$data.name="enmotion2"
+db2.$data.age=12
 console.log(db1.$data.name,1)
 console.log(db2.$data.name,2)
 // console.log(db2)

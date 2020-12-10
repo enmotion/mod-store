@@ -9,7 +9,7 @@ function AesCrypto(key){
     const Reg= /^[a-z_A-Z0-9-\.!@#\$%\\\^&\*\)\(\+=\{\}\[\]\/",'<>~\·`\?:;|]{16,16}$/;
     //创建KEY
     const aesKey = key ? key.constructor == String && key.match(Reg) ? createKey(key)
-    :console.warn("ERROR:Crypto Key must be String with 16 length , only allowed number or letter characters, crypto is not working!")
+    :console.warn("ERROR:Crypto Key must be String with 16 length,only allowed number or letter characters, crypto can not working!")
     :null;    
     //生成密钥，所有字符转字符码，并创建16位数值的数组！
     function createKey(key){let code=[];for(var i in key){code.push(key[i].charCodeAt())};return code}
@@ -38,11 +38,15 @@ function AesCrypto(key){
                 var decryptedText = aes.utils.utf8.fromBytes(decryptedBytes);
                 return JSON.parse(decryptedText);
             }catch(err){
-                console.error("ERROR:[" + dataBase.$namespace + "] try to get data with wrong key!")
+                str != "{}" ? console.error("ERROR:try to get data with wrong crypto key!"):''
                 return {}
             }            
         }else{
-            return JSON.parse(str);
+            try{
+                return str ? JSON.parse(str) : {};
+            }catch{
+                return {}
+            }            
         }
     }
     let crypto = {};
@@ -50,6 +54,7 @@ function AesCrypto(key){
         enCryptoData:{value:enCryptoData,configurable:false,writable:false,enumerable:false},
         deCryptoData:{value:deCryptoData,configurable:false,writable:false,enumerable:false}
     })
+    Object.preventExtensions(crypto)
     return crypto
 }
 export default AesCrypto

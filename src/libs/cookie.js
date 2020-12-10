@@ -1,4 +1,4 @@
-function setCookie(namespace, data, seconds) {
+function setItem(namespace, data, seconds) {
     let exp = null;
     let expires = "";
     if (seconds) {
@@ -9,7 +9,7 @@ function setCookie(namespace, data, seconds) {
     let str = JSON.stringify([data])
     document.cookie = namespace + "=" + escape(str) + expires;
 }
-function getCookie(namespace) {
+function getItem(namespace) {
     let cookie = document.cookie
     cookie = cookie.split(';').map(function (value) {
         return value.trim()
@@ -27,7 +27,7 @@ function getCookie(namespace) {
     } 
     for(var i in cookie){
         try{
-            cookie[i]=JSON.parse(unescape(cookie[i]))
+            cookie[i] = JSON.parse(unescape(cookie[i]))
             cookie[i] = cookie[i].constructor == Array ? cookie[i][0] : cookie[i]
         }catch{
             
@@ -35,7 +35,11 @@ function getCookie(namespace) {
     }
     return cookie || ''
 }
-function clearCookie(namespace){
-    setCookie(namespace,'',-1)
+function removeItem(namespace){
+    setItem(namespace,'',-1)
 }
-export {setCookie,getCookie,clearCookie}
+export default {
+    setItem,
+    getItem,
+    removeItem
+}

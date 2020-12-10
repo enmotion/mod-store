@@ -117,9 +117,9 @@ function EBS(namespace,props,key){
     }
     //清除整个缓存
     function clear(type){
-        var type = type || 'SELF';
+        // var type = type || 'SELF';
         let clearType = ['SELF','EBS','ALL'];        
-        type = clearType.indexOf(type.toUpperCase())<0?clearType[0]:type;
+        type = clearType.indexOf(type && type.toUpperCase())<0? clearType[0] : type;
         dataBase.$data={};
         cache.localStorage = {};
         cache.sessionStorage = {};
@@ -158,7 +158,7 @@ function EBS(namespace,props,key){
     } 
     //校验namespace参数不能为空或者非字符类型,命名空间实例不能已经存在   
     if(R.isNil(namespace) || R.isEmpty(namespace) || namespace.constructor != String || R.keys(nameSpacePool).indexOf("EBS:"+namespace.toUpperCase())>-1){
-        console.error("ERROR: EasyBrowserStrore Constructor parameter [namespace] must be a String and cannot be empty,");
+        console.error("ERROR: EasyBrowserStrore Constructor parameter [namespace] must be a String and cannot be empty or ot used,got [" +namespace+"]");
         return {}
     }else{        
         /*

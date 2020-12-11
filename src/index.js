@@ -14,11 +14,11 @@ function EBS(namespace,props,key){
     let aesCrypto = new Crypto(key);
     //检测运行环境,是否支持 localStorage,sessionStorage如果不支持则直接更换成cookie方式 解决兼容问题
     const storeEngine= {
-        localStorage:hasApi(window.localStorage)?window.localStorage:cookiStore,
-        sessionStorage:hasApi(window.sessionStorage)?window.sessionStorage:cookiStore,
-        cookieStorage:cookiStore
+        localStorage : hasApi(window.localStorage) ? window.localStorage : cookiStore,
+        sessionStorage : hasApi(window.sessionStorage) ? window.sessionStorage : cookiStore,
+        cookieStorage : cookiStore
     }
-    // 检测本地存储方法是否可行,如果存在不能使用的方法，则会启用cookie存储模式替代
+    // 检测本地存储方法是否可行
     function hasApi(storage){
         try {
             storage.setItem('EBSTEST','EBSTEST');
@@ -182,6 +182,7 @@ function EBS(namespace,props,key){
         addProps(props);
         //将命名空间存入命名空间池，避免重复创建
         nameSpacePool[dataBase.$namespace] = dataBase;
+        Object.preventExtensions(dataBase)
         return dataBase
     }   
 }

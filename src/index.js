@@ -5,13 +5,13 @@ import Crypto from "./libs/crypto"
 
 let nameSpacePool={};
 
-function EBS(namespace,props,key){    
+function EBS(config){    
     const storeTypes = {'L':'localStorage','S':'sessionStorage'};
     const dataBase = {};
     const schemes = {};
     const cache = {localStorage:{},sessionStorage:{},cookieStorage:{}};
     //创建aes加密器，该创建方式会根据密钥自动处理成加密方式
-    let aesCrypto = new Crypto(key);
+    let aesCrypto = new Crypto(config.key);
     //检测运行环境,是否支持 localStorage,sessionStorage如果不支持则直接更换成cookie方式 解决兼容问题
     const storeEngine= {
         localStorage : hasApi(window.localStorage) ? window.localStorage : cookiStore,
@@ -66,9 +66,9 @@ function EBS(namespace,props,key){
                         }else{
                             let cacheData = cache[schemes[i].method];
                             cacheData[i] = {
-                                value: value,
-                                type: value.constructor.name,
-                                ut: Math.round(Date.now() / 1000) //刷新更新时间
+                                v: value,
+                                c: value.constructor.name,
+                                t: Math.round(Date.now() / 1000) //刷新更新时间
                             }
                             setCache(schemes[i].method,cacheData)
                         }
@@ -76,7 +76,7 @@ function EBS(namespace,props,key){
                     get:function(){
                         let now = Math.round(Date.now() / 1000);
                         let cacheData = cache[schemes[i].method];
-                        if(cacheData.constructor == Object && cacheData[i] && (schemes[i].expireTime == null || now < schemes[i].expireTime + cacheData[i].ut)){
+                        if(cacheData.constructor == Object && cacheData[i] && (schemes[i].expireTime == null || now < schemes[i].expireTime + cacheData[i].t)){
                             var data = cacheData[i];
                             if(schemes[i].once){
                                delete cache[schemes[i].method][i];
@@ -84,8 +84,8 @@ function EBS(namespace,props,key){
                             }
                             let types = schemes[i].type && schemes[i].type.constructor == Function ? [schemes[i].type] : schemes[i].type;
                             //如果值类型不对，则返回默认值，否则返回正确值
-                            if(types && types.indexOf(data.value.constructor)>-1){
-                                return data.value
+                            if(types && types.indexOf(data.v.constructor)>-1){
+                                return data.v
                             }else{
                                 return schemes[i].default && schemes[i].default.constructor == Function ? schemes[i].default(): schemes[i].default
                             }                           
@@ -157,8 +157,8 @@ function EBS(namespace,props,key){
         }
     } 
     //校验namespace参数不能为空或者非字符类型,命名空间实例不能已经存在   
-    if(R.isNil(namespace) || R.isEmpty(namespace) || namespace.constructor != String || R.keys(nameSpacePool).indexOf("EBS:"+namespace.toUpperCase())>-1){
-        console.error("ERROR: EasyBrowserStrore Constructor parameter [namespace] must be a String and cannot be empty or ot used,got [" +namespace+"]");
+    if(R.isNil(config.namespace) || R.isEmpty(config.namespace) || config.namespace.constructor != String || R.keys(nameSpacePool).indexOf("EBS:"+config.namespace.toUpperCase())>-1){
+        console.error("ERROR: EasyBrowserStrore Constructor config[namespace] must be a String and cannot be empty or ot used,got [" +config.namespace+"]");
         return {}
     }else{        
         /*
@@ -170,7 +170,7 @@ function EBS(namespace,props,key){
          * clear 【不可写，不可配置，不可枚举】清除所有属性，'SELF','EBS','ALL'
         */
         Object.defineProperties(dataBase,{
-            $namespace:{writable:false,configurable:false,enumerable:false,value:"EBS:"+namespace.toUpperCase()},
+            $namespace:{writable:false,configurable:false,enumerable:false,value:"EBS:"+config.namespace.toUpperCase()},
             $data:{writable:true,configurable:false,enumerable:false,value:{}},                       
             clearProp:{writable:false,configurable:false,enumerable:false,value:clearProp},
             clear:{writable:false,configurable:false,enumerable:false,value:clear},
@@ -179,7 +179,7 @@ function EBS(namespace,props,key){
         cache.localStorage = getCache('localStorage');
         cache.sessionStorage = getCache('sessionStorage');
         cache.cookieStorage = getCache('cookieStorage');
-        addProps(props);
+        addProps(config.props);
         //将命名空间存入命名空间池，避免重复创建
         nameSpacePool[dataBase.$namespace] = dataBase;
         Object.preventExtensions(dataBase)

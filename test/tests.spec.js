@@ -112,6 +112,15 @@ describe('Easy-browser-store 测试',function(){
             var value = db1.$data.hoppy
             assert.deepEqual(value,["enmotion"])
         })
+        it("props.hoppy 异步操作，返回正确值",function(done){
+            db1.$data.name ="enmotion"
+            setTimeout(function(){
+                check(done,function(){
+                    var value = db1.$data.name
+                    assert.deepEqual(value,"mod")
+                })               
+            },1500)            
+        })
         it("props.hoppy 重复获取ONCE属性值，返回默认值",function(){
             // db1.$data.hoppy =["enmotion"]
             var value = db1.$data.hoppy
@@ -119,3 +128,12 @@ describe('Easy-browser-store 测试',function(){
         })        
     }) 
 })
+
+function check(done, f ) {
+    try {
+        f();
+        done();
+    } catch(e) {
+        done(e);
+    }
+}

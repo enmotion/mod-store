@@ -29,7 +29,7 @@ import EBS from "easy-browser-store"
 
 let db1=new EBS({
     namespace:"myNameSpace",//给出命名空间，easyBrowserStore会依照规则自动命名空,命名空间不可重复，重复则创建失效;
-    props:{//可以用于记录的属性，数据格式声明;
+    props:{//可以用于记录的属性，数据格式声明,为防止在使用中随意更改属性导致混乱，因此只允许在创建实例时做相关设置！！！;
         name:{
             type:[String,Number],//默认：类型无约束，数据类型
             default:"myname",//默认：undefined，默认值，默认值必须与约束类型相符，否则会报错！

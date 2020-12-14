@@ -1,23 +1,24 @@
 "use strict";
 const R = require('ramda');
 import edd from "easy-door-data";
+import purifyStore from "./libs/purify";
 import Crypto from "./libs/crypto"
 import cookiStore from "./libs/cookie";
 
 let nameSpacePool={};
 
 function EBS(config){
-    const storeTypes = {'L':'localStorage','S':'sessionStorage'};
+    const storeTypes = {'L':'l','S':'s'};
     const dataBase = {};
     const schemes = {};
-    const cache = {localStorage:{},sessionStorage:{},cookieStorage:{}};
+    const cache = {l:{},s:{},c:{}};
     //创建aes加密器，该创建方式会根据密钥自动处理成加密方式
     let aesCrypto = {};
     //检测运行环境,是否支持 localStorage,sessionStorage如果不支持则直接更换成cookie方式 解决兼容问题
     const storeEngine= {
-        localStorage : hasApi(window.localStorage) ? window.localStorage : cookiStore,
-        sessionStorage : hasApi(window.sessionStorage) ? window.sessionStorage : cookiStore,
-        cookieStorage : cookiStore
+        l : hasApi(window.localStorage) ? window.localStorage : cookiStore,
+        s : hasApi(window.sessionStorage) ? window.sessionStorage : cookiStore,
+        c : cookiStore
     }
     // 检测本地存储方法是否可行
     function hasApi(storage){
@@ -68,7 +69,7 @@ function EBS(config){
                             let cacheData = cache[schemes[i].method];
                             cacheData[i] = {
                                 v: value,
-                                c: value.constructor.name,
+                                m: schemes[i].method,
                                 t: Math.round(Date.now() / 1000) //刷新更新时间
                             }
                             setCache(schemes[i].method,cacheData)
@@ -109,12 +110,12 @@ function EBS(config){
     }
     //清除属性 清除时，仅仅删除在储值空间里的值 
     function clearProp(prop){
-        delete cache.localStorage[prop];
-        setCache('localStorage',cache.localStorage);
-        delete cache.sessionStorage[prop];
-        setCache('sessionStorage',cache.sessionStorage)
-        delete cache.cookieStorage[prop];
-        setCache('cookieStorage',cache.cookieStorage)
+        delete cache.l[prop];
+        setCache('l',cache.l);
+        delete cache.s[prop];
+        setCache('s',cache.s)
+        delete cache.c[prop];
+        setCache('c',cache.c)
     }
     //清除整个缓存
     function clear(type){
@@ -122,37 +123,37 @@ function EBS(config){
         let clearType = ['SELF','EBS','ALL'];        
         type = clearType.indexOf(type && type.toUpperCase())<0? clearType[0] : type;
         dataBase.$data={};
-        cache.localStorage = {};
-        cache.sessionStorage = {};
+        cache.l = {};
+        cache.s = {};
         switch(type){
             case 'SELF':                             
-                storeEngine.localStorage.removeItem(dataBase.$namespace)
-                storeEngine.sessionStorage.removeItem(dataBase.$namespace)
-                storeEngine.cookieStorage.removeItem(dataBase.$namespace)
+                storeEngine.l.removeItem(dataBase.$namespace)
+                storeEngine.s.removeItem(dataBase.$namespace)
+                storeEngine.c.removeItem(dataBase.$namespace)
             break;
             case 'EBS':                  
-                for(var i in storeEngine.localStorage){
+                for(var i in storeEngine.l){
                     if(i.split(':')[0] == 'EBS'){
-                        storeEngine.localStorage.removeItem(i)
+                        storeEngine.l.removeItem(i)
                     }
                 }
-                for(var i in storeEngine.sessionStorage){
+                for(var i in storeEngine.s){
                     if(i.split(':')[0] == 'EBS'){
-                        storeEngine.sessionStorage.removeItem(i)
+                        storeEngine.s.removeItem(i)
                     }
                 }
                 //cookie的遍历方式比较特殊，需要先通过无参方式获取全部的cookie对象，方可进行清除
-                for(var i in storeEngine.cookieStorage.getItem()){
+                for(var i in storeEngine.c.getItem()){
                     if(i.split(':')[0] == 'EBS'){
-                        storeEngine.cookieStorage.removeItem(i)
+                        storeEngine.c.removeItem(i)
                     }
                 }
             break;
             case 'ALL':
-                storeEngine.localStorage.clear();
-                storeEngine.sessionStorage.clear();
-                for(var i in storeEngine.cookieStorage.getItem()){
-                    storeEngine.cookieStorage.removeItem(i)
+                storeEngine.l.clear();
+                storeEngine.s.clear();
+                for(var i in storeEngine.c.getItem()){
+                    storeEngine.c.removeItem(i)
                 }
             break;
         }
@@ -181,26 +182,19 @@ function EBS(config){
         clearProp:{writable:false,configurable:false,enumerable:false,value:clearProp},
         clearData:{writable:false,configurable:false,enumerable:false,value:clear},
     })
-    //初始化缓存空间，获取缓存内的相关数值
-    cache.localStorage = getCache('localStorage');
-    cache.sessionStorage = getCache('sessionStorage');
-    cache.cookieStorage = getCache('cookieStorage');
+    //先设置属性，生成schemes 与 $data,此处应在purifyStore之前，否则无法purifyStore
     addProps(config.props);
+    //初始化缓存空间,并依照schemes净化冗余的值，获取缓存内的相关数值
+    var outData = purifyStore([getCache('l'),getCache('s'),getCache('c')],schemes)
+    cache.l=outData.l;
+    setCache('l',cache.l)
+    cache.s=outData.s;
+    setCache('s',cache.s)
+    cache.c=outData.c;
+    setCache('c',cache.c)   
     //将命名空间存入命名空间池，避免重复创建
     nameSpacePool[dataBase.$namespace] = dataBase;
     Object.preventExtensions(dataBase)
     return dataBase      
 }
 export default EBS
-
-
-//移出属性 移除时会清除在$data里的数据结构
-// function removeProp(prop){
-//     delete dataBase.$data[prop];
-//     delete schemes[prop]
-//     clearProp(prop);
-// }
-
-// $schemes:{writable:true,configurable:false,enumerable:false,value:schemes}, 
-// addProps:{writable:false,configurable:false,enumerable:false,value:addProps},           
-// removeProp:{writable:false,configurable:false,enumerable:false,value:removeProp},

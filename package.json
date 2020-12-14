@@ -5,8 +5,7 @@
   "main": "./src/index.js",
   "scripts": {
     "build": "npx webpack",
-    "build-watch": "npx webpack --watch",
-    "test": "mocha --require @babel/register ./test/*.js"
+    "test": "npx webpack --watch"
   },
   "repository": {
     "type": "git",
@@ -14,7 +13,9 @@
   },
   "keywords": [
     "localstorage",
-    "sessionstorage"
+    "sessionstorage",
+    "crypto",
+    "namespace"
   ],
   "author": "enmotion",
   "license": "MIT",
@@ -24,6 +25,7 @@
   "homepage": "https://github.com/enmotion/BrowserStorage#readme",
   "dependencies": {
     "aes-js": "^3.1.2",
+    "easy-door-data": "^1.0.1",
     "ramda": "^0.27.1"
   },
   "presets": [

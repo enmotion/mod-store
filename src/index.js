@@ -1,17 +1,18 @@
 "use strict";
 const R = require('ramda');
-import cookiStore from "./libs/cookie";
+import edd from "easy-door-data";
 import Crypto from "./libs/crypto"
+import cookiStore from "./libs/cookie";
 
 let nameSpacePool={};
 
-function EBS(config){    
+function EBS(config){
     const storeTypes = {'L':'localStorage','S':'sessionStorage'};
     const dataBase = {};
     const schemes = {};
     const cache = {localStorage:{},sessionStorage:{},cookieStorage:{}};
     //创建aes加密器，该创建方式会根据密钥自动处理成加密方式
-    let aesCrypto = new Crypto(config.key);
+    let aesCrypto = {};
     //检测运行环境,是否支持 localStorage,sessionStorage如果不支持则直接更换成cookie方式 解决兼容问题
     const storeEngine= {
         localStorage : hasApi(window.localStorage) ? window.localStorage : cookiStore,
@@ -155,36 +156,40 @@ function EBS(config){
                 }
             break;
         }
-    } 
-    //校验namespace参数不能为空或者非字符类型,命名空间实例不能已经存在   
-    if(R.isNil(config.namespace) || R.isEmpty(config.namespace) || config.namespace.constructor != String || R.keys(nameSpacePool).indexOf("EBS:"+config.namespace.toUpperCase())>-1){
-        console.error("ERROR: EasyBrowserStrore Constructor config[namespace] must be a String and cannot be empty or ot used,got [" +config.namespace+"]");
+    }
+    //config 必须为对象，不可为空或缺失
+    if(!edd(config,{type:Object},"Constructor parameter [config]")){
         return {}
-    }else{        
-        /*
-         * 定义dataBase的属性
-         * $namespace 【不可写，不可配置，不可枚举】 并在创建时依照规则赋值命名
-         * $data 【可写，不可配置，不可枚举】
-         * addProps 【 不可写，不可配置，不可枚举】添加属性
-         * removeProp 【 不可写，不可配置，不可枚举】移除属性
-         * clear 【不可写，不可配置，不可枚举】清除所有属性，'SELF','EBS','ALL'
-        */
-        Object.defineProperties(dataBase,{
-            $namespace:{writable:false,configurable:false,enumerable:false,value:"EBS:"+config.namespace.toUpperCase()},
-            $data:{writable:true,configurable:false,enumerable:false,value:{}},                       
-            clearProp:{writable:false,configurable:false,enumerable:false,value:clearProp},
-            clear:{writable:false,configurable:false,enumerable:false,value:clear},
-        })
-        //初始化缓存空间，获取缓存内的相关数值
-        cache.localStorage = getCache('localStorage');
-        cache.sessionStorage = getCache('sessionStorage');
-        cache.cookieStorage = getCache('cookieStorage');
-        addProps(config.props);
-        //将命名空间存入命名空间池，避免重复创建
-        nameSpacePool[dataBase.$namespace] = dataBase;
-        Object.preventExtensions(dataBase)
-        return dataBase
-    }   
+    }else if(!edd(config.namespace,{type:String},"Constructor parameter config.namespace") || !edd(config.props,{type:Object},"Constructor parameter config.props")){
+        //config.namespace 必须为字符，不可为空或缺失 config.props必须为对象，不可为空或者缺失
+        return {}
+    }else if(R.keys(nameSpacePool).indexOf("EBS:"+config.namespace.toUpperCase())>-1){
+        return {}
+    }
+    aesCrypto = new Crypto(config.key)
+    /*
+        * 定义dataBase的属性
+        * $namespace 【不可写，不可配置，不可枚举】 并在创建时依照规则赋值命名
+        * $data 【可写，不可配置，不可枚举】
+        * addProps 【 不可写，不可配置，不可枚举】添加属性
+        * removeProp 【 不可写，不可配置，不可枚举】移除属性
+        * clear 【不可写，不可配置，不可枚举】清除所有属性，'SELF','EBS','ALL'
+    */
+    Object.defineProperties(dataBase,{
+        $namespace:{writable:false,configurable:false,enumerable:false,value:"EBS:"+config.namespace.toUpperCase()},
+        $data:{writable:true,configurable:false,enumerable:false,value:{}},                       
+        clearProp:{writable:false,configurable:false,enumerable:false,value:clearProp},
+        clearData:{writable:false,configurable:false,enumerable:false,value:clear},
+    })
+    //初始化缓存空间，获取缓存内的相关数值
+    cache.localStorage = getCache('localStorage');
+    cache.sessionStorage = getCache('sessionStorage');
+    cache.cookieStorage = getCache('cookieStorage');
+    addProps(config.props);
+    //将命名空间存入命名空间池，避免重复创建
+    nameSpacePool[dataBase.$namespace] = dataBase;
+    Object.preventExtensions(dataBase)
+    return dataBase      
 }
 export default EBS
 

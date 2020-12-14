@@ -27107,7 +27107,7 @@
 	];
 	var reporter = "spec";
 	var slow = 75;
-	var timeout = 2000;
+	var timeout = 80000;
 	var ui = "bdd";
 	var mocharc = {
 		diff: diff$1,

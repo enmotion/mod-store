@@ -69,7 +69,7 @@ describe('Easy-browser-store 测试',function(){
             name:{
                 type:[String,Number],
                 default:"mod",
-                expireTime:1,
+                expireTime:5,
                 method:"L"
             },
             hoppy:{
@@ -114,12 +114,13 @@ describe('Easy-browser-store 测试',function(){
         })
         it("props.hoppy 异步操作，返回正确值",function(done){
             db1.$data.name ="enmotion"
+            //mocha 默认超时为2000，可以在mocha.js中修改这个时间，目前时间为80000
             setTimeout(function(){
                 check(done,function(){
                     var value = db1.$data.name
                     assert.deepEqual(value,"mod")
                 })               
-            },1500)            
+            },6000)            
         })
         it("props.hoppy 重复获取ONCE属性值，返回默认值",function(){
             // db1.$data.hoppy =["enmotion"]

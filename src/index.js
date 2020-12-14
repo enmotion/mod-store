@@ -23,10 +23,10 @@ function EBS(config){
     // 检测本地存储方法是否可行
     function hasApi(storage){
         try {
-            storage.setItem('EBSTEST','EBSTEST');
-            var str = storage.getItem('EBSTEST');
-            storage.removeItem('EBSTEST');
-            return str == 'EBSTEST' ? true : false
+            storage.setItem('EBS','9527');
+            var str = storage.getItem('EBS');
+            storage.removeItem('EBS');
+            return str == '9527' ? true : false
         }catch(error){
             return false
         }
@@ -57,42 +57,43 @@ function EBS(config){
                     once:props[i].once,
                     expireTime:props[i].expireTime,
                 }
+                let item = schemes[i]
                 //配置对象的观察模式
                 Object.defineProperty(dataBase.$data,i,{
                     configurable:true,//因为设置了set 与 get 方法，因此需修正可配置选项为true,属性可以被删除
                     enumerable:true,//同上，属性可以被枚举
                     set:function(value){
-                        let types = schemes[i].type && schemes[i].type.constructor == Function ? [schemes[i].type] : schemes[i].type;
+                        let types = item.type && item.type.constructor == Function ? [item.type] : item.type;
                         if(types && types.indexOf(value.constructor)<0){
                             console.error("ERROR:STORAGE [" + dataBase.$namespace + "] $data."+i+" invalid value,type check failed,Expected [" +R.pluck("name")(types)+"], got "+value.constructor.name)
                         }else{
-                            let cacheData = cache[schemes[i].method];
+                            let cacheData = cache[item.method];
                             cacheData[i] = {
                                 v: value,
-                                m: schemes[i].method,
+                                m: item.method,
                                 t: Math.round(Date.now() / 1000) //刷新更新时间
                             }
-                            setCache(schemes[i].method,cacheData)
+                            setCache(item.method,cacheData)
                         }
                     },
                     get:function(){
-                        let now = Math.round(Date.now() / 1000);
-                        let cacheData = cache[schemes[i].method];
-                        if(cacheData.constructor == Object && cacheData[i] && (schemes[i].expireTime == null || now < schemes[i].expireTime + cacheData[i].t)){
+                        let now = Math.round(Date.now() / 1000);                        
+                        let cacheData = cache[item.method];
+                        if(cacheData.constructor == Object && cacheData[i] && (item.expireTime == null || now < item.expireTime + cacheData[i].t)){
                             var data = cacheData[i];
-                            if(schemes[i].once){
-                               delete cache[schemes[i].method][i];
-                               setCache(schemes[i].method, cache[schemes[i].method]);
+                            if(item.once){
+                               delete cache[item.method][i];
+                               setCache(item.method, cache[item.method]);
                             }
-                            let types = schemes[i].type && schemes[i].type.constructor == Function ? [schemes[i].type] : schemes[i].type;
+                            let types = item.type && item.type.constructor == Function ? [item.type] : item.type;
                             //如果值类型不对，则返回默认值，否则返回正确值
                             if(types && types.indexOf(data.v.constructor)>-1){
                                 return data.v
                             }else{
-                                return schemes[i].default && schemes[i].default.constructor == Function ? schemes[i].default(): schemes[i].default
+                                return item.default && item.default.constructor == Function ? item.default(): item.default
                             }                           
                         }else{
-                            return schemes[i].default && schemes[i].default.constructor == Function ? schemes[i].default(): schemes[i].default
+                            return item.default && item.default.constructor == Function ? item.default(): item.default
                         }                   
                     }
                 })
@@ -119,12 +120,12 @@ function EBS(config){
     }
     //清除整个缓存
     function clear(type){
-        // var type = type || 'SELF';
         let clearType = ['SELF','EBS','ALL'];        
         type = clearType.indexOf(type && type.toUpperCase())<0? clearType[0] : type;
         dataBase.$data={};
         cache.l = {};
         cache.s = {};
+        cache.c = {};
         switch(type){
             case 'SELF':                             
                 storeEngine.l.removeItem(dataBase.$namespace)
@@ -166,13 +167,11 @@ function EBS(config){
         return {}
     }
     aesc = new Crypto(config.key)
-    /*
-        * 定义dataBase的属性
+    /*  * 定义dataBase的属性
         * $namespace 【不可写，不可配置，不可枚举】 并在创建时依照规则赋值命名
         * $data 【可写，不可配置，不可枚举】
-        * addProps 【 不可写，不可配置，不可枚举】添加属性
-        * removeProp 【 不可写，不可配置，不可枚举】移除属性
-        * clear 【不可写，不可配置，不可枚举】清除所有属性，'SELF','EBS','ALL'
+        * clearProp 【 不可写，不可配置，不可枚举】清除属性
+        * clearData 【 不可写，不可配置，不可枚举】清除所有属性，'SELF','EBS','ALL'
     */
     Object.defineProperties(dataBase,{
         $namespace:{writable:false,configurable:false,enumerable:false,value:"EBS:"+config.namespace.toUpperCase()},

@@ -13,7 +13,7 @@ function EBS(config){
     const schemes = {};
     const cache = {l:{},s:{},c:{}};
     //创建aes加密器，该创建方式会根据密钥自动处理成加密方式
-    let aesCrypto = {};
+    let aesc = {};
     //检测运行环境,是否支持 localStorage,sessionStorage如果不支持则直接更换成cookie方式 解决兼容问题
     const storeEngine= {
         l : hasApi(window.localStorage) ? window.localStorage : cookiStore,
@@ -102,11 +102,11 @@ function EBS(config){
     }
     //读取缓存
     function getCache(engineNameStr){
-        return aesCrypto.deCryptoData(storeEngine[engineNameStr].getItem(dataBase.$namespace));
+        return aesc.deCryptoData(storeEngine[engineNameStr].getItem(dataBase.$namespace));
     }
     //写入缓存
     function setCache(engineNameStr,data){
-        storeEngine[engineNameStr].setItem(dataBase.$namespace,aesCrypto.enCryptoData(data));
+        storeEngine[engineNameStr].setItem(dataBase.$namespace,aesc.enCryptoData(data));
     }
     //清除属性 清除时，仅仅删除在储值空间里的值 
     function clearProp(prop){
@@ -152,9 +152,7 @@ function EBS(config){
             case 'ALL':
                 storeEngine.l.clear();
                 storeEngine.s.clear();
-                for(var i in storeEngine.c.getItem()){
-                    storeEngine.c.removeItem(i)
-                }
+                storeEngine.c.clear();              
             break;
         }
     }
@@ -167,7 +165,7 @@ function EBS(config){
     }else if(R.keys(nameSpacePool).indexOf("EBS:"+config.namespace.toUpperCase())>-1){
         return {}
     }
-    aesCrypto = new Crypto(config.key)
+    aesc = new Crypto(config.key)
     /*
         * 定义dataBase的属性
         * $namespace 【不可写，不可配置，不可枚举】 并在创建时依照规则赋值命名

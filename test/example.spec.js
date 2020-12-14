@@ -12,8 +12,8 @@ let db1=new EBS({
         },
         age:{
             type:Number,            
-            expireTime:2,//两秒后数据过期！
-            method:"L",
+            //expireTime:2,//两秒后数据过期！
+            method:"S",
         },
         hoppy:{
             type:Array,
@@ -24,12 +24,12 @@ let db1=new EBS({
     //key:"XEF!1234UiteM~!@" //加密密钥，仅支持 16 位英文字符，数字与符号，如配置不正确或者没有配置KEY，则会明文存储数据资料，非加密模式，加密后，资料内容会占用更多的存储空间，请注意！！！
 });
 
-db1.$data.name = "enmotion";
-db1.$data.age = 12;
+// db1.$data.name = "enmotion";
+// db1.$data.age = 12;
 // db1.$data.hoppy = ["haha"]
 
-// console.log(db1.$data.name) // "myname"
-// console.log(db1.$data.age) // undefined
+console.log(db1.$data.name) // "myname"
+console.log(db1.$data.age) // undefined
 // db1.$data.name = false //报错，数据类型只允许 [String,Number]
 // db1.$data.name = "new_name";
 // console.log(db1.$data.name) // "new_name";
@@ -51,4 +51,4 @@ console.log(window.localStorage)
 console.log(window.sessionStorage)
 //清除命名空间
 //清除命名空间
-//db1.clearData("ALL");// "SELF",仅清自身，"EBS"清理所有的easyBrowserStore存储的数据，"ALL",清除本地所有缓存 
+// db1.clearData("ALL");// "SELF",仅清自身，"EBS"清理所有的easyBrowserStore存储的数据，"ALL",清除本地所有缓存

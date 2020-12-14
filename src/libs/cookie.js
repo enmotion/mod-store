@@ -38,8 +38,15 @@ function getItem(namespace) {
 function removeItem(namespace){
     setItem(namespace,'',-1)
 }
+function clear(){
+    var data = getItem()
+    for(var i in data){
+        removeItem(i)
+    }
+}
 export default {
     setItem,
     getItem,
-    removeItem
+    removeItem,
+    clear
 }

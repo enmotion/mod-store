@@ -69,7 +69,7 @@ describe('Easy-browser-store 测试',function(){
             name:{
                 type:[String,Number],
                 default:"mod",
-                expireTime:5,
+                expireTime:1,
                 method:"L"
             },
             hoppy:{
@@ -79,18 +79,18 @@ describe('Easy-browser-store 测试',function(){
             }
         }
     })
-    var db2 = new EBS({
-        namespace:"morez-crypto",
-        props:{
-            name:{
-                type:[String,Number],
-                default:"mod",
-                expireTime:3,
-                method:"L"
-            }
-        },
-        key:"!@#$QWERasdfREw!"
-    })
+    // var db2 = new EBS({
+    //     namespace:"morez-crypto",
+    //     props:{
+    //         name:{
+    //             type:[String,Number],
+    //             default:"mod",
+    //             expireTime:3,
+    //             method:"L"
+    //         }
+    //     },
+    //     key:"!@#$QWERasdfREw!"
+    // })
     describe("设置props",function(){
         it("props.name 读取属性默认值",function(){
             db1.clearProp("name")
@@ -112,25 +112,26 @@ describe('Easy-browser-store 测试',function(){
             var value = db1.$data.hoppy
             assert.deepEqual(value,["enmotion"])
         })
-        it("props.hoppy 异步操作，返回正确值",function(done){
-            db1.$data.name ="enmotion"
-            //mocha 默认超时为2000，可以在mocha.js中修改这个时间，目前时间为80000
-            setTimeout(function(){
-                check(done,function(){
-                    var value = db1.$data.name
-                    assert.deepEqual(value,"mod")
-                })               
-            },6000)            
-        })
         it("props.hoppy 重复获取ONCE属性值，返回默认值",function(){
             // db1.$data.hoppy =["enmotion"]
             var value = db1.$data.hoppy
             assert.deepEqual(value,[])
-        })        
+        })
+        it("props.hoppy 异步操作，返回正确值",function(done){
+            db1.$data.name ="enmotion"
+            //mocha 默认超时为2000，可以在mocha.js中修改这个时间，目前时间为80000
+            setTimeout(function(){
+                runDelay(done,function(){
+                    var value = db1.$data.name
+                    assert.deepEqual(value,"mod")
+                })               
+            },1000)            
+        })
+            
     }) 
 })
 
-function check(done, f ) {
+function runDelay(done, f ) {
     try {
         f();
         done();

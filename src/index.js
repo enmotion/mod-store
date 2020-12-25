@@ -1,9 +1,9 @@
 "use strict";
 const R = require('ramda');
 import edd from "easy-door-data";
+import Crypto from "mod-crypto"
+import cookiStore from "mod-cookie";
 import purifyStore from "./libs/purify";
-import Crypto from "./libs/crypto"
-import cookiStore from "./libs/cookie";
 
 let nameSpacePool={};
 
@@ -103,11 +103,11 @@ function EBS(config){
     }
     //读取缓存
     function getCache(engineNameStr){
-        return aesc.deCryptoData(storeEngine[engineNameStr].getItem(dataBase.$namespace));
+        return aesc.deCryptoStrToData(storeEngine[engineNameStr].getItem(dataBase.$namespace));
     }
     //写入缓存
     function setCache(engineNameStr,data){
-        storeEngine[engineNameStr].setItem(dataBase.$namespace,aesc.enCryptoData(data));
+        storeEngine[engineNameStr].setItem(dataBase.$namespace,aesc.enCryptoDataToStr(data));
     }
     //清除属性 清除时，仅仅删除在储值空间里的值 
     function clearProp(prop){

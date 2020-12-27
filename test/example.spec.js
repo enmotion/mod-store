@@ -1,6 +1,6 @@
-import EBS from "../src"
+import MB from "../src"
 
-let db1=new EBS({
+let db1=new MB({
     namespace:"myNameSpace",//给出命名空间，easyBrowserStore会依照规则自动命名空,命名空间不可重复，重复则创建失效;
     props:{//可以用于记录的属性，数据格式声明;
         name:{
@@ -8,7 +8,7 @@ let db1=new EBS({
             default:"myname",//默认：undefined，默认值，默认值必须与约束类型相符，否则会报错！
             expireTime:undefined,//默认：undefined 无过期时间，过期时间，过期时间到时，取值会返回默认值，而非存入值，单位秒！
            // once:true,//默认：false, 阅后即焚，该数据只读一次，读后自动销毁，下次读取则为默认值，直到新的存入！
-            method:"L"//默认：S,存储方式 'S':sessionStorage，'L':localStorage, ebs会根据浏览器环境检测相关方法，如果禁用了相关方法，则会用cookie替代
+            method:"L"//默认：S,存储方式 'S':sessionStorage，'L':localStorage, MB会根据浏览器环境检测相关方法，如果禁用了相关方法，则会用cookie替代
         },
         age:{
             type:Number,            
@@ -51,4 +51,4 @@ console.log(window.localStorage)
 console.log(window.sessionStorage)
 //清除命名空间
 //清除命名空间
-// db1.clearData("ALL");// "SELF",仅清自身，"EBS"清理所有的easyBrowserStore存储的数据，"ALL",清除本地所有缓存
+// db1.clearData("ALL");// "SELF",仅清自身，"MB"清理所有的easyBrowserStore存储的数据，"ALL",清除本地所有缓存

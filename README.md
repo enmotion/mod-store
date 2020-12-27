@@ -1,4 +1,4 @@
-# easy-browser-store #
+# mod-store #
 
 为在浏览器环境下，为操作持久化的缓存数据提供便捷。<br>
 
@@ -13,22 +13,22 @@
 #### install ####
 npm安装命令
 ```
-npm install --save easy-browser-store
+npm install --save mod-store
 ```
 
 #### Usage ####
 
 引入包
 ```
-import EBS from "easy-browser-store"
+import MS from "mod-store"
 ```
 
 USEAGE 使用方法 范例代码
 
 ```
-import EBS from "easy-browser-store"
+import MS from "mod-store"
 
-let db1=new EBS({
+let db1=new MS({
     namespace:"myNameSpace",//给出命名空间，easyBrowserStore会依照规则自动命名空,命名空间不可重复，重复则创建失效;
     props:{//可以用于记录的属性，数据格式声明,为防止在使用中随意更改属性导致混乱，因此只允许在创建实例时做相关设置！！！;
         name:{
@@ -71,18 +71,18 @@ db1.clearProp("hoppy") //数据被清空
 console.log(db1.$data.hoppy) // ["chat"]
 
 //清除命名空间
-db1.clearData("SEFL");// "SELF",仅清自身，"EBS"清理所有的easyBrowserStore存储的数据，"ALL",清除本地所有缓存 
+db1.clearData("SEFL");// "SELF",仅清自身，"MS"清理所有的easyBrowserStore存储的数据，"ALL",清除本地所有缓存 
 ```
 
 ### API 类方法 ###
-#### new EBS(config)<br> ####
+#### new MS(config)<br> ####
 namespace:命名空间
 props:用户存储的值申明
 key:密钥，16位英文字符，数字符号
 
 ```
-import EBS from "easy-browser-store"
-let db2=new EBS({
+import MS from "mod-store"
+let db2=new MS({
     namespace:"myname",
     props:{name:{},age:{}},
     key:"~1@3DAQEeEZeFik!",
@@ -96,5 +96,5 @@ propName:属性名
 ####  clearData("SELF") #### 
 清除缓存的值
 "SELF":仅清理该命名空间下的值,
-"EBS":清理所有EBS创建出来的缓存空间,
+"MS":清理所有EBS创建出来的缓存空间,
 "ALL":清理所有的缓存空间， 慎用！！！！

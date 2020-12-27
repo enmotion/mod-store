@@ -1,18 +1,18 @@
-import EBS from "../src"
+import MS from "../src"
 var assert = require ('assert');
 
 describe('Easy-browser-store 测试',function(){    
     describe("创建实例 new",function(){
         it("如果入参 缺失,返回对象$namespace=undefined",function(){            
-            var db1 = new EBS()
+            var db1 = new MS()
             assert.equal(db1.$namespace,undefined)
         })
         it("如果入参 为空,返回对象$namespace=undefined",function(){
-            var db2 = new EBS({})
+            var db2 = new MS({})
             assert.equal(db2.$namespace,undefined)
         })
         it("如果入参命名空间 为空,返回对象$namespace=undefined",function(){
-            var db3 = new EBS({
+            var db3 = new MS({
                 props:{
                     name:{},   
                     sex:{}
@@ -22,30 +22,30 @@ describe('Easy-browser-store 测试',function(){
             assert.equal(db3.$namespace,undefined)
         })
         it("如果入参命属性对象 缺失,返回对象$namespace=undefined",function(){
-            var db4 = new EBS({
+            var db4 = new MS({
                 namespace:"morez",
                 key:"AEWRtyks!@#$1234"
             })
             assert.equal(db4.$namespace,undefined)
         })
         it("如果入参命属性对象 缺失,返回对象$namespace=undefined",function(){
-            var db5 = new EBS({
+            var db5 = new MS({
                 namespace:"morez",
                 props:{},
             })
             assert.equal(db5.$namespace,undefined)
         })
         it("入参正确,返回命名空间对象 ",function(){
-            var db6 = new EBS({
+            var db6 = new MS({
                 namespace:"morez",
                 props:{
                     name:{}
                 },
             })
-            assert.equal(db6.$namespace,"EBS:MOREZ")
+            assert.equal(db6.$namespace,"MS:MOREZ")
         })
         it("命名空间重复，返回对象$namespace=undefined ",function(){
-            var db6 = new EBS({
+            var db6 = new MS({
                 namespace:"morez",
                 props:{
                     age:{}
@@ -54,16 +54,16 @@ describe('Easy-browser-store 测试',function(){
             assert.equal(db6.$namespace,undefined)
         })
         it("命名空间不重复，返回命名空间对象 ",function(){
-            var db6 = new EBS({
+            var db6 = new MS({
                 namespace:"morez2",
                 props:{
                     age:{}
                 },
             })
-            assert.equal(db6.$namespace,"EBS:MOREZ2")
+            assert.equal(db6.$namespace,"MS:MOREZ2")
         })
     })
-    var db1 = new EBS({
+    var db1 = new MS({
         namespace:"morez-unCrypto",
         props:{
             name:{
@@ -79,11 +79,12 @@ describe('Easy-browser-store 测试',function(){
             }
         }
     })
-    // var db2 = new EBS({
+    console.log("ss")
+    // var db2 = new MS({
     //     namespace:"morez-crypto",
     //     props:{
     //         name:{
-    //             type:[String,Number],
+    //             type:[String,NuMSer],
     //             default:"mod",
     //             expireTime:3,
     //             method:"L"

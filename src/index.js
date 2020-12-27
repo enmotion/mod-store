@@ -7,7 +7,7 @@ import purifyStore from "./libs/purify";
 
 let nameSpacePool={};
 
-function EBS(config){
+function ModStore(config){
     const storeTypes = {'L':'l','S':'s'};
     const dataBase = {};
     const schemes = {};
@@ -23,9 +23,9 @@ function EBS(config){
     // 检测本地存储方法是否可行
     function hasApi(storage){
         try {
-            storage.setItem('EBS','9527');
-            var str = storage.getItem('EBS');
-            storage.removeItem('EBS');
+            storage.setItem('MS','9527');
+            var str = storage.getItem('MS');
+            storage.removeItem('MS');
             return str == '9527' ? true : false
         }catch(error){
             return false
@@ -120,7 +120,7 @@ function EBS(config){
     }
     //清除整个缓存
     function clear(type){
-        let clearType = ['SELF','EBS','ALL'];        
+        let clearType = ['SELF','MS','ALL'];        
         type = clearType.indexOf(type && type.toUpperCase())<0? clearType[0] : type;
         dataBase.$data={};
         cache.l = {};
@@ -132,20 +132,20 @@ function EBS(config){
                 storeEngine.s.removeItem(dataBase.$namespace)
                 storeEngine.c.removeItem(dataBase.$namespace)
             break;
-            case 'EBS':                  
+            case 'MS':                  
                 for(var i in storeEngine.l){
-                    if(i.split(':')[0] == 'EBS'){
+                    if(i.split(':')[0] == 'MS'){
                         storeEngine.l.removeItem(i)
                     }
                 }
                 for(var i in storeEngine.s){
-                    if(i.split(':')[0] == 'EBS'){
+                    if(i.split(':')[0] == 'MS'){
                         storeEngine.s.removeItem(i)
                     }
                 }
                 //cookie的遍历方式比较特殊，需要先通过无参方式获取全部的cookie对象，方可进行清除
                 for(var i in storeEngine.c.getItem()){
-                    if(i.split(':')[0] == 'EBS'){
+                    if(i.split(':')[0] == 'MS'){
                         storeEngine.c.removeItem(i)
                     }
                 }
@@ -163,7 +163,7 @@ function EBS(config){
     }else if(!edd(config.namespace,{type:String},"Constructor parameter config.namespace") || !edd(config.props,{type:Object},"Constructor parameter config.props")){
         //config.namespace 必须为字符，不可为空或缺失 config.props必须为对象，不可为空或者缺失
         return {}
-    }else if(R.keys(nameSpacePool).indexOf("EBS:"+config.namespace.toUpperCase())>-1){
+    }else if(R.keys(nameSpacePool).indexOf("MS:"+config.namespace.toUpperCase())>-1){
         return {}
     }
     aesc = new Crypto(config.key)
@@ -171,10 +171,10 @@ function EBS(config){
         * $namespace 【不可写，不可配置，不可枚举】 并在创建时依照规则赋值命名
         * $data 【可写，不可配置，不可枚举】
         * clearProp 【 不可写，不可配置，不可枚举】清除属性
-        * clearData 【 不可写，不可配置，不可枚举】清除所有属性，'SELF','EBS','ALL'
+        * clearData 【 不可写，不可配置，不可枚举】清除所有属性，'SELF','MS','ALL'
     */
     Object.defineProperties(dataBase,{
-        $namespace:{writable:false,configurable:false,enumerable:false,value:"EBS:"+config.namespace.toUpperCase()},
+        $namespace:{writable:false,configurable:false,enumerable:false,value:"MS:"+config.namespace.toUpperCase()},
         $data:{writable:true,configurable:false,enumerable:false,value:{}},                       
         clearProp:{writable:false,configurable:false,enumerable:false,value:clearProp},
         clearData:{writable:false,configurable:false,enumerable:false,value:clear},
@@ -194,4 +194,4 @@ function EBS(config){
     Object.preventExtensions(dataBase)
     return dataBase      
 }
-export default EBS
+export default ModStore

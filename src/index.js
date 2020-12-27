@@ -1,7 +1,7 @@
 "use strict";
 const R = require('ramda');
 import edd from "easy-door-data";
-import Crypto from "mod-crypto"
+import Crypto from "mod-crypto";
 import cookiStore from "mod-cookie";
 import purifyStore from "./libs/purify";
 

@@ -24,9 +24,10 @@
   },
   "homepage": "https://github.com/enmotion/mod-store#readme",
   "dependencies": {
+    "aes-js": "^3.1.2",
     "easy-door-data": "^1.0.1",
     "mod-cookie": "^0.1.1",
-    "mod-crypto": "^1.0.1",
+    "mod-crypto": "^1.0.2",
     "ramda": "^0.27.1"
   },
   "presets": [

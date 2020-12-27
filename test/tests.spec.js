@@ -77,14 +77,14 @@ describe('Easy-browser-store 测试',function(){
                 default:[],
                 once:true,
             }
-        }
+        },
+        key:"!@#$QWERasdfREe!"
     })
-    console.log("ss")
     // var db2 = new MS({
     //     namespace:"morez-crypto",
     //     props:{
     //         name:{
-    //             type:[String,NuMSer],
+    //             type:[String,Number],
     //             default:"mod",
     //             expireTime:3,
     //             method:"L"

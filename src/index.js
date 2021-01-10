@@ -23,9 +23,9 @@ function ModStore(config){
     // 检测本地存储方法是否可行
     function hasApi(storage){
         try {
-            storage.setItem('MS','9527');
-            var str = storage.getItem('MS');
-            storage.removeItem('MS');
+            storage.setItem('ModStore','9527');
+            var str = storage.getItem('ModStore');
+            storage.removeItem('ModStore');
             return str == '9527' ? true : false
         }catch(error){
             return false

@@ -98,3 +98,7 @@ propName:属性名
 "SELF":仅清理该命名空间下的值,
 "MS":清理所有EBS创建出来的缓存空间,
 "ALL":清理所有的缓存空间， 慎用！！！！
+
+####  特别注意 ####
+为自动检测浏览器是否支持localStorage & sessionStorage
+本地缓存key:ModStore将被占用，请不使用该名称命名您的 namespace 空间，也不要在同域下被其他应用占用该命名Key;

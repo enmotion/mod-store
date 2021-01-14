@@ -79,19 +79,7 @@ describe('Easy-browser-store 测试',function(){
             }
         },
         key:"!@#$QWERasdfREe!"
-    })
-    // var db2 = new MS({
-    //     namespace:"morez-crypto",
-    //     props:{
-    //         name:{
-    //             type:[String,Number],
-    //             default:"mod",
-    //             expireTime:3,
-    //             method:"L"
-    //         }
-    //     },
-    //     key:"!@#$QWERasdfREw!"
-    // })
+    })    
     describe("设置props",function(){
         it("props.name 读取属性默认值",function(){
             db1.clearProp("name")
@@ -129,7 +117,27 @@ describe('Easy-browser-store 测试',function(){
             },1000)            
         })
             
-    }) 
+    })
+    var db2 = new MS({
+        namespace:"morez-crypto",
+        props:{
+            name:{
+                type:[String,Number],
+                default:"mod",
+                expireTime:3,
+                method:"L"
+            }
+        },
+        key:"!@#$QWERasdfREw!"
+    })
+    describe("测试clearProp",function(){
+        it("props.name 读取属性默认值",function(){
+            db1.$data.name="try new name"
+            var value = db1.$data.name
+            var clearedValue = db2.clearProp("name")
+            assert.deepEqual([value,clearedValue],["try new name","mod"])
+        })
+    })
 })
 
 function runDelay(done, f ) {

@@ -114,9 +114,10 @@ function ModStore(config){
         delete cache.l[prop];
         setCache('l',cache.l);
         delete cache.s[prop];
-        setCache('s',cache.s)
+        setCache('s',cache.s);
         delete cache.c[prop];
-        setCache('c',cache.c)
+        setCache('c',cache.c);
+        return schemes[prop].default;
     }
     //清除整个缓存
     function clear(type){

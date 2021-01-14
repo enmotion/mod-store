@@ -91,6 +91,8 @@ let db2=new MS({
 ####  clearProp(propName:String) #### 
 清除属性的存储值
 propName:属性名
+
+return prop.default 返回清空后的默认值
 清除后，该属性存储在缓存中的值将被抹除
 
 ####  clearData("SELF") #### 

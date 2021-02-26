@@ -62,18 +62,6 @@ function ModStore(config){
                     enumerable:true,//同上，属性可以被枚举
                     set:function(value){
                         setItem(i,value)
-                        // let types = item.type && item.type.constructor == Function ? [item.type] : item.type;
-                        // if(types && types.indexOf(value.constructor)<0){
-                        //     console.error("ERROR:STORAGE [" + dataBase.$namespace + "] $data."+i+" invalid value,type check failed,Expected [" +R.pluck("name")(types)+"], got "+value.constructor.name)
-                        // }else{
-                        //     let cacheData = cache[item.method];
-                        //     cacheData[i] = {
-                        //         v: value,
-                        //         m: item.method,
-                        //         t: Math.round(Date.now()/1000) //刷新更新时间
-                        //     }
-                        //     setCache(item.method,cacheData)
-                        // }
                     },
                     get:function(){
                         let now = Math.round(Date.now()/1000);                        

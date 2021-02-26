@@ -12,6 +12,7 @@ let db1=new MS({
         },
         age:{
             type:Number,
+            default:0,
             expireTime:2,//两秒后数据过期！
         },
         hoppy:{
@@ -19,9 +20,10 @@ let db1=new MS({
             default:["chat"]
         }
     },
+    capacity:{l:1,s:1,c:1},
     key:"AEWRtyks!@#$1234" //加密密钥，仅支持 16 位英文字符，数字与符号，如配置不正确或者没有配置KEY，则会明文存储数据资料，非加密模式，加密后，资料内容会占用更多的存储空间，请注意！！！
 });
-
+console.log(db1)
 console.log(db1.$data.name) // "myname"
 console.log(db1.$data.age) // undefined
 db1.$data.name = false //报错，数据类型只允许 [String,Number]
@@ -29,11 +31,11 @@ db1.$data.name = "new_name";
 console.log(db1.$data.name) // "new_name";
 console.log(db1.$data.name) // "myname" 阅后即焚，数值被清除，只返回 默认值 "myname"
 
-db1.$data.age = 12
+db1.setItem("age",22)
 console.log(db1.$data.age) // 12
 setTimeout(function(){
-    console.log(db1.$data.age) // undefined 数据已经过期，返回默认值！
-},2001)
+    console.log(db1.$data.age) // undefined 数据已经过期，返回默认值 0！
+},1994)
 console.log(db1.$data.age) // 12
 
 //清除数据
@@ -43,4 +45,4 @@ db1.clearProp("hoppy") //数据被清空
 console.log(db1.$data.hoppy) // ["chat"]
 
 //清除命名空间
-db1.clearData("ALL");// "SELF",仅清自身，"MS"清理所有的easyBrowserStore存储的数据，"ALL",清除本地所有缓存
+//db1.clearData("ALL");// "SELF",仅清自身，"MS"清理所有的easyBrowserStore存储的数据，"ALL",清除本地所有缓存

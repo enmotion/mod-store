@@ -1,7 +1,7 @@
 import MS from "../src"
 var assert = require ('assert');
 
-describe('Easy-browser-store 测试',function(){    
+describe('Mod-Store 测试',function(){    
     describe("创建实例 new",function(){
         it("如果入参 缺失,返回对象$namespace=undefined",function(){            
             var db1 = new MS()

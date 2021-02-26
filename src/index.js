@@ -12,8 +12,6 @@ function ModStore(config){
     const dataBase = {};
     const schemes = {};
     const cache = {l:{},s:{},c:{}};
-    //创建aes加密器，该创建方式会根据密钥自动处理成加密方式
-    let aesc = {};
     //检测运行环境,是否支持 localStorage,sessionStorage如果不支持则直接更换成cookie方式 解决兼容问题
     const storeEngine= {
         l : hasApi(window.localStorage) ? window.localStorage : cookiStore,
@@ -63,23 +61,28 @@ function ModStore(config){
                     configurable:true,//因为设置了set 与 get 方法，因此需修正可配置选项为true,属性可以被删除
                     enumerable:true,//同上，属性可以被枚举
                     set:function(value){
-                        let types = item.type && item.type.constructor == Function ? [item.type] : item.type;
-                        if(types && types.indexOf(value.constructor)<0){
-                            console.error("ERROR:STORAGE [" + dataBase.$namespace + "] $data."+i+" invalid value,type check failed,Expected [" +R.pluck("name")(types)+"], got "+value.constructor.name)
-                        }else{
-                            let cacheData = cache[item.method];
-                            cacheData[i] = {
-                                v: value,
-                                m: item.method,
-                                t: Math.round(Date.now() / 1000) //刷新更新时间
-                            }
-                            setCache(item.method,cacheData)
-                        }
+                        setItem(i,value)
+                        // console.log(,4444)
+                        // if(!setItem(i,value)){
+                            
+                        // }
+                        // let types = item.type && item.type.constructor == Function ? [item.type] : item.type;
+                        // if(types && types.indexOf(value.constructor)<0){
+                        //     console.error("ERROR:STORAGE [" + dataBase.$namespace + "] $data."+i+" invalid value,type check failed,Expected [" +R.pluck("name")(types)+"], got "+value.constructor.name)
+                        // }else{
+                        //     let cacheData = cache[item.method];
+                        //     cacheData[i] = {
+                        //         v: value,
+                        //         m: item.method,
+                        //         t: Date.now() //刷新更新时间
+                        //     }
+                        //     setCache(item.method,cacheData)
+                        // }
                     },
                     get:function(){
-                        let now = Math.round(Date.now() / 1000);                        
+                        let now = Date.now();                        
                         let cacheData = cache[item.method];
-                        if(cacheData.constructor == Object && cacheData[i] && (item.expireTime == null || now < item.expireTime + cacheData[i].t)){
+                        if(cacheData.constructor == Object && cacheData[i] && (item.expireTime == null || now < item.expireTime * 1000 + cacheData[i].t)){
                             var data = cacheData[i];
                             if(item.once){
                                delete cache[item.method][i];
@@ -107,9 +110,52 @@ function ModStore(config){
     }
     //写入缓存
     function setCache(engineNameStr,data){
-        storeEngine[engineNameStr].setItem(dataBase.$namespace,aesc.enCryptoDataToStr(data));
+        let str = aesc.enCryptoDataToStr(data);
+        let long = getStringByteLength(str);
+        console.log(long,capacity,R.isNil(capacity),5555)
+        if(R.isNil(capacity[engineNameStr]) || capacity[engineNameStr]*1024 >= long){
+            console.log("ok")
+            storeEngine[engineNameStr].setItem(dataBase.$namespace,aesc.enCryptoDataToStr(data));
+            return true;
+        }else{
+            return false;
+        }
     }
-    //清除属性 清除时，仅仅删除在储值空间里的值 
+    function getStringByteLength(val) {  
+        var str = new String(val);  
+        var bytesCount = 0;  
+        for (var i = 0 ,n = str.length; i < n; i++) {  
+            var c = str.charCodeAt(i);  
+            if ((c >= 0x0001 && c <= 0x007e) || (0xff60<=c && c<=0xff9f)) {  
+                bytesCount += 1;  
+            } else {  
+                bytesCount += 2;  
+            }  
+        }  
+        return bytesCount;  
+    }
+    function setItem(itemKey,value){
+        console.log(itemKey,value,11111)
+        let item = schemes[itemKey]
+        let types = item.type && item.type.constructor == Function ? [item.type] : item.type;
+        if(types && types.indexOf(value.constructor)<0){
+            console.error("ERROR:STORAGE [" + dataBase.$namespace + "] $data."+itemKey+" invalid value,type check failed,Expected [" +R.pluck("name")(types)+"], got "+value.constructor.name)
+            return false
+        }else{
+            let cacheData = cache[item.method];
+            cacheData[itemKey] = {
+                v: value,
+                m: item.method,
+                t: Date.now() //刷新更新时间
+            }
+            let result = setCache(item.method,cacheData);
+            if(!result){
+                console.error("ERROR:STORAGE [" + dataBase.$namespace + "] capacity is full, cache prop:"+itemKey+" is failure")
+            }
+            return result
+        }
+    }
+    //清除属性 清除时，仅仅删除在储值空间里的值
     function clearProp(prop){
         delete cache.l[prop];
         setCache('l',cache.l);
@@ -160,13 +206,16 @@ function ModStore(config){
     //config 必须为对象，不可为空或缺失
     if(!edd(config,{type:Object},"Constructor parameter [config]")){
         return {}
-    }else if(!edd(config.namespace,{type:String},"Constructor parameter config.namespace") || !edd(config.props,{type:Object},"Constructor parameter config.props")){
+    }else if(!edd(config.namespace,{type:String},"Constructor parameter config.namespace") || !edd(config.props,{type:Object},"Constructor parameter config.props") || !edd(config.capacity,{type:Object,notNil:false},"Constructor parameter config.capacity")){
         //config.namespace 必须为字符，不可为空或缺失 config.props必须为对象，不可为空或者缺失
         return {}
     }else if(R.keys(nameSpacePool).indexOf("MS:"+config.namespace.toUpperCase())>-1){
         return {}
+    }else if(config.capacity && !edd(config.capacity.l,{type:Number,notNil:false},"Constructor parameter config.capacity.l") && !edd(config.capacity.s,{type:Number,notNil:false},"Constructor parameter config.capacity.s") && !edd(config.capacity.c,{type:Number,notNil:false},"Constructor parameter config.capacity.c")){
+        return {}
     }
-    aesc = new Crypto(config.key)
+    const aesc = new Crypto(config.key) // 实例加密器
+    const capacity = config.capacity || {} //设置存储容量大小
     /*  * 定义dataBase的属性
         * $namespace 【不可写，不可配置，不可枚举】 并在创建时依照规则赋值命名
         * $data 【可写，不可配置，不可枚举】
@@ -175,7 +224,9 @@ function ModStore(config){
     */
     Object.defineProperties(dataBase,{
         $namespace:{writable:false,configurable:false,enumerable:false,value:"MS:"+config.namespace.toUpperCase()},
-        $data:{writable:true,configurable:false,enumerable:false,value:{}},                       
+        $capacity:{writable:false,configurable:false,enumerable:false,value:capacity},
+        $data:{writable:true,configurable:false,enumerable:false,value:{}},
+        setItem:{writable:false,configurable:false,enumerable:false,value:setItem},                    
         clearProp:{writable:false,configurable:false,enumerable:false,value:clearProp},
         clearData:{writable:false,configurable:false,enumerable:false,value:clear},
     })

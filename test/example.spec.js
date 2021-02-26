@@ -8,7 +8,7 @@ let db1=new MS({
             default:"myname",//默认：undefined，默认值，默认值必须与约束类型相符，否则会报错！
             expireTime:undefined,//默认：undefined 无过期时间，过期时间，过期时间到时，取值会返回默认值，而非存入值，单位秒！
             once:true,//默认：false, 阅后即焚，该数据只读一次，读后自动销毁，下次读取则为默认值，直到新的存入！
-            method:"S"//默认：S,存储方式 'S':sessionStorage，'L':localStorage, ebs会根据浏览器环境检测相关方法，如果禁用了相关方法，则会用cookie替代
+            method:"l"//默认：S,存储方式 'S':sessionStorage，'L':localStorage, ebs会根据浏览器环境检测相关方法，如果禁用了相关方法，则会用cookie替代
         },
         age:{
             type:Number,
@@ -21,15 +21,16 @@ let db1=new MS({
         }
     },
     capacity:{l:1,s:1,c:1},
-    key:"AEWRtyks!@#$1234" //加密密钥，仅支持 16 位英文字符，数字与符号，如配置不正确或者没有配置KEY，则会明文存储数据资料，非加密模式，加密后，资料内容会占用更多的存储空间，请注意！！！
+    // key:"AEWRtyks!@#$1234" //加密密钥，仅支持 16 位英文字符，数字与符号，如配置不正确或者没有配置KEY，则会明文存储数据资料，非加密模式，加密后，资料内容会占用更多的存储空间，请注意！！！
 });
 console.log(db1)
+db1.$data.name ="try my best"
 console.log(db1.$data.name) // "myname"
 console.log(db1.$data.age) // undefined
-db1.$data.name = false //报错，数据类型只允许 [String,Number]
+// db1.$data.name = false //报错，数据类型只允许 [String,Number]
 db1.$data.name = "new_name";
 console.log(db1.$data.name) // "new_name";
-console.log(db1.$data.name) // "myname" 阅后即焚，数值被清除，只返回 默认值 "myname"
+// console.log(db1.$data.name) // "myname" 阅后即焚，数值被清除，只返回 默认值 "myname"
 
 db1.setItem("age",22)
 console.log(db1.$data.age) // 12
@@ -41,7 +42,7 @@ console.log(db1.$data.age) // 12
 //清除数据
 db1.$data.hoppy = ["runing","singing"];
 console.log(db1.$data.hoppy) // ["runing","singing"]
-db1.clearProp("hoppy") //数据被清空
+// db1.clearProp("hoppy") //数据被清空
 console.log(db1.$data.hoppy) // ["chat"]
 
 //清除命名空间

@@ -62,10 +62,6 @@ function ModStore(config){
                     enumerable:true,//同上，属性可以被枚举
                     set:function(value){
                         setItem(i,value)
-                        // console.log(,4444)
-                        // if(!setItem(i,value)){
-                            
-                        // }
                         // let types = item.type && item.type.constructor == Function ? [item.type] : item.type;
                         // if(types && types.indexOf(value.constructor)<0){
                         //     console.error("ERROR:STORAGE [" + dataBase.$namespace + "] $data."+i+" invalid value,type check failed,Expected [" +R.pluck("name")(types)+"], got "+value.constructor.name)
@@ -74,15 +70,15 @@ function ModStore(config){
                         //     cacheData[i] = {
                         //         v: value,
                         //         m: item.method,
-                        //         t: Date.now() //刷新更新时间
+                        //         t: Math.round(Date.now()/1000) //刷新更新时间
                         //     }
                         //     setCache(item.method,cacheData)
                         // }
                     },
                     get:function(){
-                        let now = Date.now();                        
+                        let now = Math.round(Date.now()/1000);                        
                         let cacheData = cache[item.method];
-                        if(cacheData.constructor == Object && cacheData[i] && (item.expireTime == null || now < item.expireTime * 1000 + cacheData[i].t)){
+                        if(cacheData.constructor == Object && cacheData[i] && (item.expireTime == null || now < item.expireTime + cacheData[i].t)){
                             var data = cacheData[i];
                             if(item.once){
                                delete cache[item.method][i];
@@ -109,15 +105,17 @@ function ModStore(config){
         return aesc.deCryptoStrToData(storeEngine[engineNameStr].getItem(dataBase.$namespace));
     }
     //写入缓存
-    function setCache(engineNameStr,data){
+    function setCache(engineNameStr,data,overSizeWithClear){
         let str = aesc.enCryptoDataToStr(data);
         let long = getStringByteLength(str);
-        console.log(long,capacity,R.isNil(capacity),5555)
-        if(R.isNil(capacity[engineNameStr]) || capacity[engineNameStr]*1024 >= long){
-            console.log("ok")
+        console.log(long,Math.round(capacity[engineNameStr]*1024),R.isNil(capacity),2222)
+        if(R.isNil(capacity[engineNameStr]) || Math.round(capacity[engineNameStr]*1024) >= long){
             storeEngine[engineNameStr].setItem(dataBase.$namespace,aesc.enCryptoDataToStr(data));
             return true;
         }else{
+            if(overSizeWithClear){
+                storeEngine[engineNameStr].setItem(dataBase.$namespace,aesc.enCryptoDataToStr({}));
+            }
             return false;
         }
     }
@@ -135,22 +133,23 @@ function ModStore(config){
         return bytesCount;  
     }
     function setItem(itemKey,value){
-        console.log(itemKey,value,11111)
         let item = schemes[itemKey]
         let types = item.type && item.type.constructor == Function ? [item.type] : item.type;
         if(types && types.indexOf(value.constructor)<0){
             console.error("ERROR:STORAGE [" + dataBase.$namespace + "] $data."+itemKey+" invalid value,type check failed,Expected [" +R.pluck("name")(types)+"], got "+value.constructor.name)
             return false
         }else{
-            let cacheData = cache[item.method];
+            let cacheData = R.clone(cache[item.method]);
             cacheData[itemKey] = {
                 v: value,
                 m: item.method,
-                t: Date.now() //刷新更新时间
+                t: Math.round(Date.now()/1000) //刷新更新时间
             }
             let result = setCache(item.method,cacheData);
             if(!result){
                 console.error("ERROR:STORAGE [" + dataBase.$namespace + "] capacity is full, cache prop:"+itemKey+" is failure")
+            }else{
+                cache[item.method] = cacheData
             }
             return result
         }
@@ -236,11 +235,11 @@ function ModStore(config){
     //初始化缓存空间,并依照schemes净化冗余的值，获取缓存内的相关数值
     var outData = purifyStore([getCache('l'),getCache('s'),getCache('c')],schemes)
     cache.l=outData.l;
-    setCache('l',cache.l)
+    setCache('l',cache.l,true)
     cache.s=outData.s;
-    setCache('s',cache.s)
+    setCache('s',cache.s,true)
     cache.c=outData.c;
-    setCache('c',cache.c)   
+    setCache('c',cache.c,true)   
     //将命名空间存入命名空间池，避免重复创建
     nameSpacePool[dataBase.$namespace] = dataBase;
     Object.preventExtensions(dataBase)

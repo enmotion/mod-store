@@ -47,6 +47,10 @@ let db1=new MS({
             defalut:["chat"]
         }
     },
+    capacity:{
+        l:1, //存储容量,localStroage 单位KB
+        s:1.5, //存储容量,localStroage 单位KB
+    }
     key:"XEF!1234UiteM~!@" //加密密钥，仅支持 16 位英文字符，数字与符号，如配置不正确或者没有配置KEY，则会明文存储数据资料，非加密模式，加密后，资料内容会占用更多的存储空间，请注意！！！
 });
 
@@ -76,18 +80,31 @@ db1.clearData("SEFL");// "SELF",仅清自身，"MS"清理所有的easyBrowserSto
 
 ### API 类方法 ###
 #### new MS(config)<br> ####
-namespace:命名空间
-props:用户存储的值申明
-key:密钥，16位英文字符，数字符号
-
+namespace:String 命名空间 <br>
+props:Object 用户存储的值申明  <br>
+capacity:Object 存储容量限制 <br>
+key:String 密钥，16位英文字符，数字符号<br>
+PS:当初始化时，如相关的存储空间超过capacity内的容量控制，则会清空该存储空间，方便重置内容！
 ```
 import MS from "mod-store"
 let db2=new MS({
     namespace:"myname",
     props:{name:{},age:{}},
+    capacity:{
+        l:1,//localStorage 存储容量 单位KB
+        s:1,//sessionStorage 存储容量 单位KB
+        c:1,//cookie 存储容量 单位KB
+    },
     key:"~1@3DAQEeEZeFik!",
 });
 ```
+####  setItem(propName:String,value) #### 
+存储<br>
+propName:属性名<br>
+value:存储的值<br>
+return:true/false <br>
+setItem:该方法当拥有存储限制时，超过存储容量则会返回存储结果,为false时，为存储容量超过上限，存储并未成功。<br>
+
 ####  clearProp(propName:String) #### 
 清除属性的存储值
 propName:属性名

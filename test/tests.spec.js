@@ -124,20 +124,37 @@ describe('Mod-Store 测试',function(){
             name:{
                 type:[String,Number],
                 default:"mod",
-                expireTime:3,
+                expireTime:3000,
+                method:"L"
+            },
+            desc:{
+                type:[String,Number,Array,Object],
+                default:"desc",
                 method:"L"
             }
         },
+        capacity:{l:0.2},
         key:"!@#$QWERasdfREw!"
     })
     describe("测试clearProp",function(){
         it("props.name 读取属性默认值",function(){
-            db1.$data.name="try new name"
-            var value = db1.$data.name
+            db2.$data.name="newn"
+            var value = db2.$data.name
             var clearedValue = db2.clearProp("name")
-            assert.deepEqual([value,clearedValue],["try new name","mod"])
-        })
+            assert.deepEqual([value,clearedValue],["newn","mod"])
+        })       
     })
+    describe("测试setItem 溢出属性",function(){
+        it("props.desc 存储内容溢出,存储无效",function(){
+            db2.$data.desc="来个超大的额风电开发进度的法术等级反对尽快立法实践发圣诞快乐房价是的发动机撒开了幅度萨芬萨芬发射点发射点发射点发士大夫阿斯蒂芬发送对方身上的发生四点发送"
+            var value = db2.$data.desc
+            assert.deepEqual(value,"desc")
+        })
+        it("props.desc setItem 存储大小限制,超过返回false",function(){
+            var result = db2.setItem("desc","来个超大的额风电开发进度的法术等级反对尽快立法实践发圣诞快乐房价是的发动机撒开了幅度萨芬萨芬发射点发射点发射点发士大夫阿斯蒂芬发送对方身上的发生四点发送")
+            assert.deepEqual(result,false)
+        })
+    }) 
 })
 
 function runDelay(done, f ) {

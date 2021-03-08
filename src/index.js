@@ -96,7 +96,6 @@ function ModStore(config){
     function setCache(engineNameStr,data,overSizeWithClear){
         let str = aesc.enCryptoDataToStr(data);
         let long = getStringByteLength(str);
-        console.log(long,Math.round(capacity[engineNameStr]*1024),R.isNil(capacity),2222)
         if(R.isNil(capacity[engineNameStr]) || Math.round(capacity[engineNameStr]*1024) >= long){
             storeEngine[engineNameStr].setItem(dataBase.$namespace,aesc.enCryptoDataToStr(data));
             return true;

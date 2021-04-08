@@ -1,5 +1,4 @@
 import MS from "../src"
-
 let db1=new MS({
     namespace:"enmotion",//给出命名空间，easyBrowserStore会依照规则自动命名空,命名空间不可重复，重复则创建失效;
     props:{//可以用于记录的属性，数据格式声明,为防止在使用中随意更改属性导致混乱，因此只允许在创建实例时做相关设置！！！;
@@ -23,7 +22,7 @@ let db1=new MS({
     // capacity:{l:2,s:2,c:2},
     // key:"AEWRtyks!@#$1234" //加密密钥，仅支持 16 位英文字符，数字与符号，如配置不正确或者没有配置KEY，则会明文存储数据资料，非加密模式，加密后，资料内容会占用更多的存储空间，请注意！！！
 });
-// db1.$data.name="我们得"
+db1.$data.name="我们得"
 console.log('352222bf0f6669c5768b7f317dfc092b6a45ecce751ac69f462509b184770d529ad65554747ce578d239febbd89400ef797d6746'.length,1111)
 console.log(db1.setItem("name","你是我的aere1"))
 console.log(db1.$data.name) // "myname"

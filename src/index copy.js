@@ -8,7 +8,6 @@ import purifyStore from "./libs/purify";
 let nameSpacePool={};
 
 function ModStore(config){
-    const that = this;
     const storeTypes = {'L':'l','S':'s'};
     const dataBase = {};
     const schemes = {};
@@ -209,18 +208,18 @@ function ModStore(config){
         * $data 【可写，不可配置，不可枚举】
         * clearProp 【 不可写，不可配置，不可枚举】清除属性
         * clearData 【 不可写，不可配置，不可枚举】清除所有属性，'SELF','MS','ALL'
-    */   
+    */
     Object.defineProperties(dataBase,{
         $namespace:{writable:false,configurable:false,enumerable:false,value:"MS:"+config.namespace.toUpperCase()},
         $capacity:{writable:false,configurable:false,enumerable:false,value:capacity},
         $data:{writable:true,configurable:false,enumerable:false,value:{}},
-        setItem:{writable:false,configurable:false,enumerable:false,value:setItem},
+        setItem:{writable:false,configurable:false,enumerable:false,value:setItem},                    
         clearProp:{writable:false,configurable:false,enumerable:false,value:clearProp},
         clearData:{writable:false,configurable:false,enumerable:false,value:clear},
     })
-    // //先设置属性，生成schemes 与 $data,此处应在purifyStore之前，否则无法purifyStore
+    //先设置属性，生成schemes 与 $data,此处应在purifyStore之前，否则无法purifyStore
     addProps(config.props);
-    // //初始化缓存空间,并依照schemes净化冗余的值，获取缓存内的相关数值
+    //初始化缓存空间,并依照schemes净化冗余的值，获取缓存内的相关数值
     var outData = purifyStore([getCache('l'),getCache('s'),getCache('c')],schemes)
     cache.l=outData.l;
     setCache('l',cache.l,true)
@@ -228,9 +227,9 @@ function ModStore(config){
     setCache('s',cache.s,true)
     cache.c=outData.c;
     setCache('c',cache.c,true)   
-    // //将命名空间存入命名空间池，避免重复创建
+    //将命名空间存入命名空间池，避免重复创建
     nameSpacePool[dataBase.$namespace] = dataBase;
     Object.preventExtensions(dataBase)
-    return dataBase
+    return dataBase      
 }
 export default ModStore

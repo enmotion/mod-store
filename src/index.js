@@ -2,22 +2,19 @@
 const R = require('ramda');
 import edd from "easy-door-data";
 import Crypto from "mod-crypto";
-import cookiStore from "mod-cookie";
 import purifyStore from "./libs/purify";
 
 let nameSpacePool={};
 
 function ModStore(config){
-    const that = this;
     const storeTypes = {'L':'l','S':'s'};
     const dataBase = {};
     const schemes = {};
-    const cache = {l:{},s:{},c:{}};
+    const cache = {l:{},s:{}};
     //检测运行环境,是否支持 localStorage,sessionStorage如果不支持则直接更换成cookie方式 解决兼容问题
     const storeEngine= {
-        l : hasApi(window.localStorage) ? window.localStorage : cookiStore,
-        s : hasApi(window.sessionStorage) ? window.sessionStorage : cookiStore,
-        c : cookiStore
+        l : window.localStorage,
+        s : window.sessionStorage,
     }
     // 检测本地存储方法是否可行
     function hasApi(storage){
@@ -148,8 +145,6 @@ function ModStore(config){
         setCache('l',cache.l);
         delete cache.s[prop];
         setCache('s',cache.s);
-        delete cache.c[prop];
-        setCache('c',cache.c);
         return schemes[prop].default;
     }
     //清除整个缓存
@@ -159,12 +154,10 @@ function ModStore(config){
         dataBase.$data={};
         cache.l = {};
         cache.s = {};
-        cache.c = {};
         switch(type){
             case 'SELF':                             
                 storeEngine.l.removeItem(dataBase.$namespace)
                 storeEngine.s.removeItem(dataBase.$namespace)
-                storeEngine.c.removeItem(dataBase.$namespace)
             break;
             case 'MS':                  
                 for(var i in storeEngine.l){
@@ -177,17 +170,10 @@ function ModStore(config){
                         storeEngine.s.removeItem(i)
                     }
                 }
-                //cookie的遍历方式比较特殊，需要先通过无参方式获取全部的cookie对象，方可进行清除
-                for(var i in storeEngine.c.getItem()){
-                    if(i.split(':')[0] == 'MS'){
-                        storeEngine.c.removeItem(i)
-                    }
-                }
             break;
             case 'ALL':
                 storeEngine.l.clear();
-                storeEngine.s.clear();
-                storeEngine.c.clear();              
+                storeEngine.s.clear();              
             break;
         }
     }
@@ -221,13 +207,12 @@ function ModStore(config){
     // //先设置属性，生成schemes 与 $data,此处应在purifyStore之前，否则无法purifyStore
     addProps(config.props);
     // //初始化缓存空间,并依照schemes净化冗余的值，获取缓存内的相关数值
-    var outData = purifyStore([getCache('l'),getCache('s'),getCache('c')],schemes)
+    var outData = purifyStore([getCache('l'),getCache('s')],schemes)
     cache.l=outData.l;
     setCache('l',cache.l,true)
     cache.s=outData.s;
     setCache('s',cache.s,true)
-    cache.c=outData.c;
-    setCache('c',cache.c,true)   
+ 
     // //将命名空间存入命名空间池，避免重复创建
     nameSpacePool[dataBase.$namespace] = dataBase;
     Object.preventExtensions(dataBase)

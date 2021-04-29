@@ -6,15 +6,15 @@ import purifyStore from "./libs/purify";
 
 let nameSpacePool={};
 
-function ModStore(config,storage){
+function ModStore(config){
     const storeTypes = {'L':'l','S':'s'};
     const dataBase = {};
     const schemes = {};
     const cache = {l:{},s:{}};
     //检测运行环境,是否支持 localStorage,sessionStorage如果不支持则直接更换成cookie方式 解决兼容问题
     const storeEngine= {
-        l : hasApi(window.localStorage)?window.localStorage:storage,
-        s : hasApi(window.localStorage)?window.sessionStorage:storage,
+        l : hasApi(window?window.localStorage:null)?window.localStorage:config.storage,
+        s : hasApi(window?window.sessionStorage:null)?window.sessionStorage:config.storage,
     }
     // 检测本地存储方法是否可行
     function hasApi(storage){

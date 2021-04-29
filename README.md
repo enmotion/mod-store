@@ -11,7 +11,7 @@
 6.支持cookie作为兼容方案，当浏览器不能使用localStorage或sessionStorage时，自动切换为cookie方案进行数据储存，数据模型更改时，本地缓存的数据也会进行相应的净化操作。
 PS:1.0.6 及以上版本弃用该功能！<br>
 7.数据加密：支持自定义16字符长度的字符串为密钥，对存入的数据进行加解密处理，避免敏感数据明文暴露。<br>
-8.支持依照window.localStorage方法实现的其他本地缓存方式，应对如微信小程序开发的情况。待测试确定中....
+8.支持依照window.localStorage方法实现的其他本地缓存方式，应对如微信小程序开发的情况。注意：1.8以上的版本支持
 #### install ####
 npm安装命令
 ```
@@ -86,6 +86,8 @@ namespace:String 命名空间 <br>
 props:Object 用户存储的值申明  <br>
 capacity:Object 存储容量限制 <br>
 key:String 密钥，16位英文字符，数字符号<br>
+stroage:{setItem,getItem,removeItem,clear} 需依照相关标准API分别实现同功能的方法！>=1.0.8版本<br>
+<br>
 PS:当初始化时，如相关的存储空间超过capacity内的容量控制，则会清空该存储空间，方便重置内容！
 ```
 import MS from "mod-store"
@@ -97,6 +99,27 @@ let db2=new MS({
         s:1,//sessionStorage 存储容量 单位KB
     },
     key:"~1@3DAQEeEZeFik!",
+});
+```
+PS:兼容其他小程序缓存的使用情况
+
+```
+import MS from "mod-store"
+let db2=new MS({
+    namespace:"myname",
+    props:{name:{},age:{}},
+    capacity:{
+        l:1,//localStorage 存储容量 单位KB
+        s:1,//sessionStorage 存储容量 单位KB
+    },
+    key:"~1@3DAQEeEZeFik!",
+    //此处更换原生的缓存API为微信的缓存api.提升兼容性！
+    stroage:{
+		setItem:wx.setStorageSync,
+		getItem:wx.getStorageSync,
+		removeItem:wx.removeStorageSync,
+		clear:wx.clearStorageSync
+	}
 });
 ```
 ####  setItem(propName:String,value) #### 

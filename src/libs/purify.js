@@ -1,4 +1,4 @@
-const R = require("ramda");
+import * as R from "ramda";
 export default function purifyStore(dataArray,target,value){
     var cacheData = {};
     var outData ={'l':{},'s':{},'c':{}};  

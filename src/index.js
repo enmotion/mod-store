@@ -1,5 +1,5 @@
 "use strict";
-const R = require('ramda');
+import * as R from "ramda";
 import edd from "easy-door-data";
 import Crypto from "mod-crypto";
 import purifyStore from "./libs/purify";

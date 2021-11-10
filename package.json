@@ -1,6 +1,6 @@
 {
   "name": "mod-store",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "Web browser localstorage & sessionstorage until",
   "main": "./src/index.js",
   "scripts": {
@@ -25,7 +25,7 @@
   "homepage": "https://github.com/enmotion/mod-store#readme",
   "dependencies": {
     "aes-js": "^3.1.2",
-    "easy-door-data": "^1.0.2",
+    "easy-door-data": "^1.0.4",
     "mod-crypto": "^1.0.2",
     "ramda": "^0.27.1"
   },

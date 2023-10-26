@@ -1,5 +1,5 @@
 "use strict";
-import * as R from "ramda";
+import { clone, pluck, keys, isNil} from "ramda";
 import edd from "easy-door-data";
 import Crypto from "mod-crypto";
 import purifyStore from "./libs/purify";
@@ -37,7 +37,7 @@ function ModStore(config){
                     var defaultValue = props[b].default.constructor == Function ? props[b].default():props[b].default
                     let types = props[b].type.constructor == Function ? [props[b].type] : props[b].type;
                     if(types.indexOf(defaultValue.constructor)<0){
-                        console.error("ERROR:invalid default value,props:"+b+",Expected "+R.pluck("name")(types)+", got "+defaultValue.constructor.name);
+                        console.error("ERROR:invalid default value,props:"+b+",Expected "+pluck("name")(types)+", got "+defaultValue.constructor.name);
                         return;
                     }
                 }                
@@ -46,9 +46,9 @@ function ModStore(config){
                 schemes[i]={
                     type: props[i].type,//元素类型
                     default:props[i].default,//元素返回的默认值，默认情况下为null
-                    // method: R.keys(storeTypes).indexOf(props[i].method)<0? storeTypes.S : storeTypes[props[i].method], //设置存储方式,如果入参错误就做session储存
+                    // method: keys(storeTypes).indexOf(props[i].method)<0? storeTypes.S : storeTypes[props[i].method], //设置存储方式,如果入参错误就做session储存
                     method:function(m){
-                        return R.keys(storeTypes).indexOf(m)<0? storeTypes.S : storeTypes[m];
+                        return keys(storeTypes).indexOf(m)<0? storeTypes.S : storeTypes[m];
                     }(props[i].method),
                     once:props[i].once,
                     expireTime:props[i].expireTime,
@@ -94,7 +94,7 @@ function ModStore(config){
     function setCache(engineNameStr,data,overSizeWithClear){
         let str = aesc.enCryptoDataToStr(data);
         let long = getStringByteLength(str);
-        if(R.isNil(capacity[engineNameStr]) || Math.round(capacity[engineNameStr]*1024) >= long){
+        if(isNil(capacity[engineNameStr]) || Math.round(capacity[engineNameStr]*1024) >= long){
             storeEngine[engineNameStr].setItem(dataBase.$namespace,aesc.enCryptoDataToStr(data));
             return true;
         }else{
@@ -121,10 +121,10 @@ function ModStore(config){
         let item = schemes[itemKey]
         let types = item.type && item.type.constructor == Function ? [item.type] : item.type;
         if(types && types.indexOf(value.constructor)<0){
-            console.error("ERROR:STORAGE [" + dataBase.$namespace + "] $data."+itemKey+" invalid value,type check failed,Expected [" +R.pluck("name")(types)+"], got "+value.constructor.name)
+            console.error("ERROR:STORAGE [" + dataBase.$namespace + "] $data."+itemKey+" invalid value,type check failed,Expected [" +pluck("name")(types)+"], got "+value.constructor.name)
             return false
         }else{
-            let cacheData = R.clone(cache[item.method]);
+            let cacheData = clone(cache[item.method]);
             cacheData[itemKey] = {
                 v: value,
                 m: item.method,
@@ -183,7 +183,7 @@ function ModStore(config){
     }else if(!edd(config.namespace,{type:String},"Constructor parameter config.namespace") || !edd(config.props,{type:Object},"Constructor parameter config.props") || !edd(config.capacity,{type:Object,notNil:false},"Constructor parameter config.capacity")){
         //config.namespace 必须为字符，不可为空或缺失 config.props必须为对象，不可为空或者缺失
         return {}
-    }else if(R.keys(nameSpacePool).indexOf("MS:"+config.namespace.toUpperCase())>-1){
+    }else if(keys(nameSpacePool).indexOf("MS:"+config.namespace.toUpperCase())>-1){
         return {}
     }else if(config.capacity && !edd(config.capacity.l,{type:Number,notNil:false},"Constructor parameter config.capacity.l") && !edd(config.capacity.s,{type:Number,notNil:false},"Constructor parameter config.capacity.s") && !edd(config.capacity.c,{type:Number,notNil:false},"Constructor parameter config.capacity.c")){
         return {}
